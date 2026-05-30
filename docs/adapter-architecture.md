@@ -16,5 +16,6 @@ Rails Doctor delegates to mature tools instead of duplicating their domains:
 - complexity: Flog
 - duplication: Flay
 - migration safety: Strong Migrations
+- test coverage: SimpleCov result set reader
 
 Rails Doctor-owned checks fill Rails-specific gaps and synthesize cross-tool signals for reports and agents.

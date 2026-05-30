@@ -1,6 +1,6 @@
 # Output Schema
 
-`rails-doctor --format json` emits schema version `1.0`.
+`rails-doctor --format json` emits schema version `1.1`.
 
 Top-level fields:
 
@@ -10,9 +10,32 @@ Top-level fields:
 - `profile`
 - `metadata`
 - `summary`
+- `coverage`
 - `findings`
 - `hotspots`
 - `tool_runs`
+
+`coverage` is `null` for profiles that do not run the `test_coverage` adapter. When present, it contains:
+
+- `available`
+- `status`
+- `source`
+- `report_path`
+- `line_percent`
+- `branch_percent`
+- `covered_lines`
+- `missed_lines`
+- `total_lines`
+- `covered_branches`
+- `missed_branches`
+- `total_branches`
+- `thresholds`
+- `top_files`
+- `low_file_count`
+- `changed_files_below_threshold`
+- `metadata`
+
+`status` is one of `ok`, `below_threshold`, `missing`, `invalid`, `empty`, or `disabled`. Missing or empty coverage emits an informational `coverage-gap` finding. Invalid coverage emits a `tool-execution` finding. Aggregate line, per-file line, and configured branch thresholds emit normal `test-coverage` findings.
 
 Each finding contains:
 

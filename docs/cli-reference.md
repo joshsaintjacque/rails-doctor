@@ -16,6 +16,8 @@ Options:
 - `--fail-on info|low|medium|high|critical`
 - `--min-score N`
 
+`ci` and `deep` profiles read SimpleCov coverage metrics after the configured test command. Low coverage is reported as `medium` `test-coverage` findings, so existing severity and score gates can enforce it.
+
 ## `rails-doctor init`
 
 Detects the Rails app, writes `.rails-doctor.yml`, optionally writes GitHub Actions workflow files, and offers to install missing development/test tooling.

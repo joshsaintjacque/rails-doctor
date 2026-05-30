@@ -141,6 +141,71 @@ module RailsDoctor
     end
   end
 
+  Coverage = Struct.new(
+    :available,
+    :status,
+    :source,
+    :report_path,
+    :line_percent,
+    :branch_percent,
+    :covered_lines,
+    :missed_lines,
+    :total_lines,
+    :covered_branches,
+    :missed_branches,
+    :total_branches,
+    :thresholds,
+    :top_files,
+    :low_file_count,
+    :changed_files_below_threshold,
+    :metadata,
+    keyword_init: true
+  ) do
+    def initialize(**kwargs)
+      super
+      self.available = false if available.nil?
+      self.thresholds ||= {}
+      self.top_files ||= []
+      self.changed_files_below_threshold ||= []
+      self.metadata ||= {}
+    end
+
+    def summary
+      {
+        available: available,
+        status: status,
+        source: source,
+        line_percent: line_percent,
+        branch_percent: branch_percent,
+        thresholds: thresholds,
+        low_file_count: low_file_count || top_files.count { |file| file[:below_threshold] },
+        changed_file_low_count: changed_files_below_threshold.size
+      }.compact
+    end
+
+    def to_h
+      {
+        available: available,
+        status: status,
+        source: source,
+        report_path: report_path,
+        line_percent: line_percent,
+        branch_percent: branch_percent,
+        covered_lines: covered_lines,
+        missed_lines: missed_lines,
+        total_lines: total_lines,
+        covered_branches: covered_branches,
+        missed_branches: missed_branches,
+        total_branches: total_branches,
+        thresholds: thresholds,
+        top_files: top_files,
+        low_file_count: low_file_count,
+        changed_files_below_threshold: changed_files_below_threshold,
+        metadata: metadata
+      }.compact
+    end
+  end
+
   ScanResult = Struct.new(
     :started_at,
     :finished_at,
@@ -152,6 +217,7 @@ module RailsDoctor
     :skipped_tools,
     :score,
     :hotspots,
+    :coverage,
     :raw_outputs,
     keyword_init: true
   ) do
@@ -187,18 +253,20 @@ module RailsDoctor
         finding_count: findings.size,
         severity_counts: counts,
         skipped_tools: skipped_tools.map(&:to_h),
-        score: score&.to_h
+        score: score&.to_h,
+        coverage: coverage&.summary
       }
     end
 
     def to_h(include_raw: false)
       {
-        schema_version: "1.0",
+        schema_version: "1.1",
         generated_at: (finished_at || Time.now).iso8601,
         project_root: project_root,
         profile: profile,
         metadata: metadata,
         summary: summary,
+        coverage: coverage&.to_h,
         findings: findings.map(&:to_h),
         hotspots: hotspots.map(&:to_h),
         tool_runs: tool_runs.map { |run| run.to_h(include_raw: include_raw) }

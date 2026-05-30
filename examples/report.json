@@ -1,42 +1,23 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-05-30T10:01:35-07:00",
-  "project_root": "/Users/joshs/workspace/rails-doctor/test/fixtures/rails_apps/sample_app",
+  "schema_version": "1.1",
+  "generated_at": "2026-05-30T20:00:00Z",
+  "project_root": "/path/to/app",
   "profile": "deep",
   "metadata": {
     "rails_app": true,
     "ruby_version": "3.4.1",
     "rails_version": "8.0.0",
-    "branch": "main",
-    "changed_files": [
-      ".github/workflows/ci.yml",
-      "README.md",
-      "docs/cli-reference.md",
-      "docs/config-reference.md",
-      "docs/output-schema.md",
-      "docs/scoring-model.md",
-      "lib/rails_doctor/adapters/base.rb",
-      "lib/rails_doctor/agent/handoff.rb",
-      "lib/rails_doctor/checks/rails_checks.rb",
-      "lib/rails_doctor/cli.rb",
-      "lib/rails_doctor/config.rb",
-      "lib/rails_doctor/init/runner.rb",
-      "lib/rails_doctor/project.rb",
-      "lib/rails_doctor/scanner.rb",
-      "lib/rails_doctor/scorer.rb",
-      "test/scanner_e2e_test.rb",
-      "test/test_helper.rb"
-    ]
+    "changed_files": []
   },
   "summary": {
     "profile": "deep",
-    "duration_ms": 1895,
-    "finding_count": 29,
+    "duration_ms": 600,
+    "finding_count": 24,
     "severity_counts": {
-      "medium": 7,
+      "medium": 10,
       "critical": 1,
       "high": 10,
-      "low": 11
+      "low": 3
     },
     "skipped_tools": [],
     "score": {
@@ -45,251 +26,290 @@
       "confidence": 100,
       "penalties": [
         {
-          "id": "rd-ywuhgyxnv443",
+          "id": "rd-gfnxqbg1qkup",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "Rails/TimeZone: Use Time.current instead of Time.now.",
           "penalty": 3.0
         },
         {
-          "id": "rd-ms17mr6ho23i",
+          "id": "rd-op6mq8hfnm99",
           "severity": "critical",
           "file": "app/models/post.rb",
           "message": "SQL Injection: Possible SQL injection",
           "penalty": 15.0
         },
         {
-          "id": "rd-o0owxs80kze7",
+          "id": "rd-habnfsz1zgdj",
           "severity": "high",
           "file": "Gemfile.lock",
           "message": "rack: Example vulnerability",
           "penalty": 7.0
         },
         {
-          "id": "rd-xymmedqpqmvm",
+          "id": "rd-2er9zgsavtk6",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "TooManyStatements: has the smell of too many statements",
           "penalty": 3.0
         },
         {
-          "id": "rd-5c5g4o9sbfji",
+          "id": "rd-ci7ub1199rvp",
           "severity": "low",
           "file": "config/initializers/strong_migrations.rb",
           "message": "strong_migrations is installed but no initializer was found",
           "penalty": 0.75
         },
         {
-          "id": "rd-5f133dpvbis7",
+          "id": "rd-iad8kr5ch7mh",
           "severity": "high",
           "file": "db/schema.rb",
           "message": "posts.user_id has no index",
           "penalty": 7.0
         },
         {
-          "id": "rd-3w0bzo7py23i",
+          "id": "rd-nd2oek4kujwu",
           "severity": "high",
           "file": "app/models/user.rb",
           "message": "users.email has a Rails uniqueness validation without a unique database index",
           "penalty": 5.25
         },
         {
-          "id": "rd-27ijinr4c4pn",
+          "id": "rd-p9vqylkxcybn",
           "severity": "high",
           "file": "config/routes.rb",
           "message": "Routes reference missing ghosts_controller.rb",
           "penalty": 7.0
         },
         {
-          "id": "rd-ffhx20y3nt7p",
+          "id": "rd-stmr7t8qmjti",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#create",
           "penalty": 7.0
         },
         {
-          "id": "rd-1dr70aklsfc4",
+          "id": "rd-c9eld5z4i9rf",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#destroy",
           "penalty": 7.0
         },
         {
-          "id": "rd-f0tkm37e5q8z",
+          "id": "rd-hdn01soot3gf",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#edit",
           "penalty": 7.0
         },
         {
-          "id": "rd-3opupg0o1uxa",
+          "id": "rd-ygjxjocmpubf",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#new",
           "penalty": 7.0
         },
         {
-          "id": "rd-w04f8shvj1u3",
+          "id": "rd-q2wm1ehy5qn",
           "severity": "medium",
           "file": "app/controllers/posts_controller.rb",
           "message": "posts#show has no matching template or explicit response",
           "penalty": 2.25
         },
         {
-          "id": "rd-dnjiepb376dw",
+          "id": "rd-w4g0okt214t6",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#update",
           "penalty": 7.0
         },
         {
-          "id": "rd-p9ymf47scu39",
+          "id": "rd-elkkq3siut9a",
           "severity": "low",
           "file": "app/controllers/posts_controller.rb",
           "message": "posts#archive is not referenced by simple route analysis",
           "penalty": 0.4
         },
         {
-          "id": "rd-j7356p5v1l96",
+          "id": "rd-4f2vjquwx6t4",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "1 TODO/FIXME/HACK marker in 10 lines",
           "penalty": 2.25
         },
         {
-          "id": "rd-auqlkf0t85og",
+          "id": "rd-4dacnomu05u7",
           "severity": "medium",
           "file": null,
           "message": "DEPRECATION WARNING: old API is deprecated",
           "penalty": 2.25
         },
         {
-          "id": "rd-ro413tdnjqtk",
+          "id": "rd-bg982jjw6xt3",
           "severity": "high",
           "file": null,
           "message": "Prosopite: N+1 queries detected for Post => [:user]",
           "penalty": 5.25
         },
         {
-          "id": "rd-tpnff7mqqlek",
+          "id": "rd-qx8han58wk0o",
+          "severity": "medium",
+          "file": null,
+          "message": "Line coverage 48.00% is below the 90.00% threshold",
+          "penalty": 3.0
+        },
+        {
+          "id": "rd-9ikgvif63uif",
+          "severity": "medium",
+          "file": "app/controllers/posts_controller.rb",
+          "message": "app/controllers/posts_controller.rb line coverage 22.22% is below the 80.00% per-file threshold",
+          "penalty": 3.0
+        },
+        {
+          "id": "rd-s83lai6gkb0r",
+          "severity": "medium",
+          "file": "app/models/post.rb",
+          "message": "app/models/post.rb line coverage 44.44% is below the 80.00% per-file threshold",
+          "penalty": 3.0
+        },
+        {
+          "id": "rd-l380zgdih1jq",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "High complexity score 32.5 for Post#publish!",
           "penalty": 2.25
         },
         {
-          "id": "rd-q3s2bjrmpygy",
+          "id": "rd-xq812p6rik5z",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2",
           "penalty": 2.25
         },
         {
-          "id": "rd-5e6m3ot0oe80",
+          "id": "rd-7wpu6grg34b2",
           "severity": "low",
           "file": "Gemfile.lock",
-          "message": "brakeman appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-4r55dbbeum4f",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "bundler-audit appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-snyhl4ci5ij8",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "flay appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-dyem0whtns8j",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "flog appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-unsaagxftzan",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "prosopite appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-flo6l7x4rni9",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "rails appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-lfyn2r9onanc",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "rubocop appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-uto5invgg93y",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "rubocop-rails appears to be outdated",
-          "penalty": 0.75
-        },
-        {
-          "id": "rd-ax112wj3cykf",
-          "severity": "low",
-          "file": "Gemfile.lock",
-          "message": "strong_migrations appears to be outdated",
+          "message": "rack appears to be outdated",
           "penalty": 0.75
         }
       ],
       "top_score_movers": [
         {
-          "id": "rd-ms17mr6ho23i",
+          "id": "rd-op6mq8hfnm99",
           "severity": "critical",
           "file": "app/models/post.rb",
           "message": "SQL Injection: Possible SQL injection",
           "penalty": 15.0
         },
         {
-          "id": "rd-o0owxs80kze7",
+          "id": "rd-habnfsz1zgdj",
           "severity": "high",
           "file": "Gemfile.lock",
           "message": "rack: Example vulnerability",
           "penalty": 7.0
         },
         {
-          "id": "rd-5f133dpvbis7",
+          "id": "rd-w4g0okt214t6",
+          "severity": "high",
+          "file": "app/controllers/posts_controller.rb",
+          "message": "Route points to missing posts#update",
+          "penalty": 7.0
+        },
+        {
+          "id": "rd-ygjxjocmpubf",
+          "severity": "high",
+          "file": "app/controllers/posts_controller.rb",
+          "message": "Route points to missing posts#new",
+          "penalty": 7.0
+        },
+        {
+          "id": "rd-iad8kr5ch7mh",
           "severity": "high",
           "file": "db/schema.rb",
           "message": "posts.user_id has no index",
           "penalty": 7.0
-        },
-        {
-          "id": "rd-27ijinr4c4pn",
-          "severity": "high",
-          "file": "config/routes.rb",
-          "message": "Routes reference missing ghosts_controller.rb",
-          "penalty": 7.0
-        },
-        {
-          "id": "rd-ffhx20y3nt7p",
-          "severity": "high",
-          "file": "app/controllers/posts_controller.rb",
-          "message": "Route points to missing posts#create",
-          "penalty": 7.0
         }
       ]
+    },
+    "coverage": {
+      "available": true,
+      "status": "below_threshold",
+      "source": "simplecov",
+      "line_percent": 48.0,
+      "branch_percent": 50.0,
+      "thresholds": {
+        "line": 90.0,
+        "file_line": 80.0,
+        "branch": null
+      },
+      "low_file_count": 2,
+      "changed_file_low_count": 0
     }
+  },
+  "coverage": {
+    "available": true,
+    "status": "below_threshold",
+    "source": "simplecov",
+    "report_path": "coverage/.resultset.json",
+    "line_percent": 48.0,
+    "branch_percent": 50.0,
+    "covered_lines": 12,
+    "missed_lines": 13,
+    "total_lines": 25,
+    "covered_branches": 1,
+    "missed_branches": 1,
+    "total_branches": 2,
+    "thresholds": {
+      "line": 90.0,
+      "file_line": 80.0,
+      "branch": null
+    },
+    "top_files": [
+      {
+        "file": "app/controllers/posts_controller.rb",
+        "line_percent": 22.22,
+        "covered_lines": 2,
+        "missed_lines": 7,
+        "total_lines": 9,
+        "below_threshold": true
+      },
+      {
+        "file": "app/models/post.rb",
+        "line_percent": 44.44,
+        "covered_lines": 4,
+        "missed_lines": 5,
+        "total_lines": 9,
+        "branch_percent": 50.0,
+        "covered_branches": 1,
+        "missed_branches": 1,
+        "total_branches": 2,
+        "below_threshold": true
+      },
+      {
+        "file": "app/models/user.rb",
+        "line_percent": 80.0,
+        "covered_lines": 4,
+        "missed_lines": 1,
+        "total_lines": 5,
+        "below_threshold": false
+      },
+      {
+        "file": "app/controllers/health_controller.rb",
+        "line_percent": 100.0,
+        "covered_lines": 2,
+        "missed_lines": 0,
+        "total_lines": 2,
+        "below_threshold": false
+      }
+    ],
+    "low_file_count": 2,
+    "changed_files_below_threshold": [],
+    "metadata": {}
   },
   "findings": [
     {
-      "id": "rd-ywuhgyxnv443",
+      "id": "rd-gfnxqbg1qkup",
       "severity": "medium",
       "category": "lint",
       "tool": "rubocop",
@@ -305,7 +325,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-ms17mr6ho23i",
+      "id": "rd-op6mq8hfnm99",
       "severity": "critical",
       "category": "security",
       "tool": "brakeman",
@@ -321,7 +341,7 @@
       }
     },
     {
-      "id": "rd-o0owxs80kze7",
+      "id": "rd-habnfsz1zgdj",
       "severity": "high",
       "category": "dependency-security",
       "tool": "bundler_audit",
@@ -340,7 +360,7 @@
       }
     },
     {
-      "id": "rd-xymmedqpqmvm",
+      "id": "rd-2er9zgsavtk6",
       "severity": "medium",
       "category": "code-smell",
       "tool": "reek",
@@ -357,7 +377,7 @@
       }
     },
     {
-      "id": "rd-5c5g4o9sbfji",
+      "id": "rd-ci7ub1199rvp",
       "severity": "low",
       "category": "migration-safety",
       "tool": "strong_migrations",
@@ -370,7 +390,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-5f133dpvbis7",
+      "id": "rd-iad8kr5ch7mh",
       "severity": "high",
       "category": "database-integrity",
       "tool": "rails_checks",
@@ -385,7 +405,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-3w0bzo7py23i",
+      "id": "rd-nd2oek4kujwu",
       "severity": "high",
       "category": "database-integrity",
       "tool": "rails_checks",
@@ -400,7 +420,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-27ijinr4c4pn",
+      "id": "rd-p9vqylkxcybn",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -413,7 +433,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-ffhx20y3nt7p",
+      "id": "rd-stmr7t8qmjti",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -426,7 +446,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-1dr70aklsfc4",
+      "id": "rd-c9eld5z4i9rf",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -439,7 +459,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-f0tkm37e5q8z",
+      "id": "rd-hdn01soot3gf",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -452,7 +472,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-3opupg0o1uxa",
+      "id": "rd-ygjxjocmpubf",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -465,7 +485,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-w04f8shvj1u3",
+      "id": "rd-q2wm1ehy5qn",
       "severity": "medium",
       "category": "routing",
       "tool": "rails_checks",
@@ -478,7 +498,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-dnjiepb376dw",
+      "id": "rd-w4g0okt214t6",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -491,7 +511,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-p9ymf47scu39",
+      "id": "rd-elkkq3siut9a",
       "severity": "low",
       "category": "dead-code",
       "tool": "rails_checks",
@@ -504,7 +524,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-j7356p5v1l96",
+      "id": "rd-4f2vjquwx6t4",
       "severity": "medium",
       "category": "technical-debt",
       "tool": "rails_checks",
@@ -517,7 +537,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-auqlkf0t85og",
+      "id": "rd-4dacnomu05u7",
       "severity": "medium",
       "category": "deprecation",
       "tool": "test_runner",
@@ -530,7 +550,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-ro413tdnjqtk",
+      "id": "rd-bg982jjw6xt3",
       "severity": "high",
       "category": "runtime-n-plus-one",
       "tool": "test_runner",
@@ -545,7 +565,90 @@
       "metadata": {}
     },
     {
-      "id": "rd-tpnff7mqqlek",
+      "id": "rd-qx8han58wk0o",
+      "severity": "medium",
+      "category": "test-coverage",
+      "tool": "test_coverage",
+      "confidence": "high",
+      "message": "Line coverage 48.00% is below the 90.00% threshold",
+      "recommendation": "Add tests for uncovered application code, starting with the lowest-coverage files.",
+      "agent_instruction": "Prioritize behavior tests for uncovered app/lib code. Use the coverage metadata to start with files below the configured threshold.",
+      "suggested_commands": [],
+      "metadata": {
+        "line_percent": 48.0,
+        "threshold": 90.0,
+        "low_files": [
+          {
+            "file": "app/controllers/posts_controller.rb",
+            "line_percent": 22.22,
+            "covered_lines": 2,
+            "missed_lines": 7,
+            "total_lines": 9,
+            "below_threshold": true
+          },
+          {
+            "file": "app/models/post.rb",
+            "line_percent": 44.44,
+            "covered_lines": 4,
+            "missed_lines": 5,
+            "total_lines": 9,
+            "branch_percent": 50.0,
+            "covered_branches": 1,
+            "missed_branches": 1,
+            "total_branches": 2,
+            "below_threshold": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "rd-9ikgvif63uif",
+      "severity": "medium",
+      "category": "test-coverage",
+      "tool": "test_coverage",
+      "file": "app/controllers/posts_controller.rb",
+      "confidence": "high",
+      "message": "app/controllers/posts_controller.rb line coverage 22.22% is below the 80.00% per-file threshold",
+      "recommendation": "Add focused tests that exercise the uncovered behavior in this file.",
+      "agent_instruction": "Add or update tests for this file before expanding the implementation. Prefer behavior-level tests that cover the missing branches or lines.",
+      "suggested_commands": [],
+      "metadata": {
+        "file": "app/controllers/posts_controller.rb",
+        "line_percent": 22.22,
+        "covered_lines": 2,
+        "missed_lines": 7,
+        "total_lines": 9,
+        "below_threshold": true,
+        "threshold": 80.0
+      }
+    },
+    {
+      "id": "rd-s83lai6gkb0r",
+      "severity": "medium",
+      "category": "test-coverage",
+      "tool": "test_coverage",
+      "file": "app/models/post.rb",
+      "confidence": "high",
+      "message": "app/models/post.rb line coverage 44.44% is below the 80.00% per-file threshold",
+      "recommendation": "Add focused tests that exercise the uncovered behavior in this file.",
+      "agent_instruction": "Add or update tests for this file before expanding the implementation. Prefer behavior-level tests that cover the missing branches or lines.",
+      "suggested_commands": [],
+      "metadata": {
+        "file": "app/models/post.rb",
+        "line_percent": 44.44,
+        "covered_lines": 4,
+        "missed_lines": 5,
+        "total_lines": 9,
+        "branch_percent": 50.0,
+        "covered_branches": 1,
+        "missed_branches": 1,
+        "total_branches": 2,
+        "below_threshold": true,
+        "threshold": 80.0
+      }
+    },
+    {
+      "id": "rd-l380zgdih1jq",
       "severity": "medium",
       "category": "complexity",
       "tool": "flog",
@@ -561,7 +664,7 @@
       }
     },
     {
-      "id": "rd-q3s2bjrmpygy",
+      "id": "rd-xq812p6rik5z",
       "severity": "medium",
       "category": "duplication",
       "tool": "flay",
@@ -580,137 +683,17 @@
       }
     },
     {
-      "id": "rd-5e6m3ot0oe80",
+      "id": "rd-7wpu6grg34b2",
       "severity": "low",
       "category": "dependency-freshness",
       "tool": "dependency_freshness",
       "file": "Gemfile.lock",
       "confidence": "medium",
-      "message": "brakeman appears to be outdated",
+      "message": "rack appears to be outdated",
       "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update brakeman conservatively and run the full test suite.",
+      "agent_instruction": "Do not batch this with feature work. Update rack conservatively and run the full test suite.",
       "suggested_commands": [
-        "bundle update brakeman"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-4r55dbbeum4f",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "bundler-audit appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update bundler-audit conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update bundler-audit"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-snyhl4ci5ij8",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "flay appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update flay conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update flay"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-dyem0whtns8j",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "flog appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update flog conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update flog"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-unsaagxftzan",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "prosopite appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update prosopite conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update prosopite"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-flo6l7x4rni9",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "rails appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update rails conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update rails"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-lfyn2r9onanc",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "rubocop appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update rubocop conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update rubocop"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-uto5invgg93y",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "rubocop-rails appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update rubocop-rails conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update rubocop-rails"
-      ],
-      "metadata": {}
-    },
-    {
-      "id": "rd-ax112wj3cykf",
-      "severity": "low",
-      "category": "dependency-freshness",
-      "tool": "dependency_freshness",
-      "file": "Gemfile.lock",
-      "confidence": "medium",
-      "message": "strong_migrations appears to be outdated",
-      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update strong_migrations conservatively and run the full test suite.",
-      "suggested_commands": [
-        "bundle update strong_migrations"
+        "bundle update rack"
       ],
       "metadata": {}
     }
@@ -718,20 +701,21 @@
   "hotspots": [
     {
       "file": "app/controllers/posts_controller.rb",
-      "score": 39,
-      "finding_count": 7,
+      "score": 42,
+      "finding_count": 8,
       "churn": 0,
       "changed": false,
       "categories": [
         "dead-code",
-        "routing"
+        "routing",
+        "test-coverage"
       ],
-      "summary": "Inherited file with 7 findings across routing, dead-code."
+      "summary": "Inherited file with 8 findings across routing, dead-code, test-coverage."
     },
     {
       "file": "app/models/post.rb",
-      "score": 30,
-      "finding_count": 6,
+      "score": 33,
+      "finding_count": 7,
       "churn": 0,
       "changed": false,
       "categories": [
@@ -740,21 +724,22 @@
         "duplication",
         "lint",
         "security",
-        "technical-debt"
+        "technical-debt",
+        "test-coverage"
       ],
-      "summary": "Inherited file with 6 findings across lint, security, code-smell, technical-debt, complexity, duplication."
+      "summary": "Inherited file with 7 findings across lint, security, code-smell, technical-debt, test-coverage, complexity, duplication."
     },
     {
       "file": "Gemfile.lock",
-      "score": 16,
-      "finding_count": 10,
+      "score": 8,
+      "finding_count": 2,
       "churn": 0,
       "changed": false,
       "categories": [
         "dependency-freshness",
         "dependency-security"
       ],
-      "summary": "Inherited file with 10 findings across dependency-security, dependency-freshness."
+      "summary": "Inherited file with 2 findings across dependency-security, dependency-freshness."
     },
     {
       "file": "db/schema.rb",
@@ -808,7 +793,7 @@
       "skipped": false,
       "command": "../../fake_bin/rubocop",
       "exit_status": 1,
-      "duration_ms": 29,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -817,7 +802,7 @@
       "skipped": false,
       "command": "../../fake_bin/brakeman",
       "exit_status": 3,
-      "duration_ms": 31,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -826,7 +811,7 @@
       "skipped": false,
       "command": "../../fake_bin/bundle-audit",
       "exit_status": 1,
-      "duration_ms": 31,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -835,7 +820,7 @@
       "skipped": false,
       "command": "../../fake_bin/rails zeitwerk:check",
       "exit_status": 0,
-      "duration_ms": 28,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -844,7 +829,7 @@
       "skipped": false,
       "command": "../../fake_bin/reek",
       "exit_status": 2,
-      "duration_ms": 30,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -852,6 +837,7 @@
       "available": true,
       "skipped": false,
       "exit_status": 0,
+      "duration_ms": 50,
       "metadata": {
         "coverage": "strong_migrations gem detected",
         "initializer_present": false
@@ -862,6 +848,7 @@
       "available": true,
       "skipped": false,
       "exit_status": 0,
+      "duration_ms": 50,
       "metadata": {
         "checks": [
           "indexes",
@@ -881,8 +868,77 @@
       "skipped": false,
       "command": "../../fake_bin/passing_tests",
       "exit_status": 0,
-      "duration_ms": 28,
+      "duration_ms": 50,
       "metadata": {}
+    },
+    {
+      "name": "test_coverage",
+      "available": true,
+      "skipped": false,
+      "exit_status": 0,
+      "duration_ms": 1,
+      "metadata": {
+        "coverage": {
+          "available": true,
+          "status": "below_threshold",
+          "source": "simplecov",
+          "report_path": "coverage/.resultset.json",
+          "line_percent": 48.0,
+          "branch_percent": 50.0,
+          "covered_lines": 12,
+          "missed_lines": 13,
+          "total_lines": 25,
+          "covered_branches": 1,
+          "missed_branches": 1,
+          "total_branches": 2,
+          "thresholds": {
+            "line": 90.0,
+            "file_line": 80.0,
+            "branch": null
+          },
+          "top_files": [
+            {
+              "file": "app/controllers/posts_controller.rb",
+              "line_percent": 22.22,
+              "covered_lines": 2,
+              "missed_lines": 7,
+              "total_lines": 9,
+              "below_threshold": true
+            },
+            {
+              "file": "app/models/post.rb",
+              "line_percent": 44.44,
+              "covered_lines": 4,
+              "missed_lines": 5,
+              "total_lines": 9,
+              "branch_percent": 50.0,
+              "covered_branches": 1,
+              "missed_branches": 1,
+              "total_branches": 2,
+              "below_threshold": true
+            },
+            {
+              "file": "app/models/user.rb",
+              "line_percent": 80.0,
+              "covered_lines": 4,
+              "missed_lines": 1,
+              "total_lines": 5,
+              "below_threshold": false
+            },
+            {
+              "file": "app/controllers/health_controller.rb",
+              "line_percent": 100.0,
+              "covered_lines": 2,
+              "missed_lines": 0,
+              "total_lines": 2,
+              "below_threshold": false
+            }
+          ],
+          "low_file_count": 2,
+          "changed_files_below_threshold": [],
+          "metadata": {}
+        }
+      }
     },
     {
       "name": "flog",
@@ -890,7 +946,7 @@
       "skipped": false,
       "command": "../../fake_bin/flog",
       "exit_status": 0,
-      "duration_ms": 27,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -899,7 +955,7 @@
       "skipped": false,
       "command": "../../fake_bin/flay",
       "exit_status": 0,
-      "duration_ms": 27,
+      "duration_ms": 50,
       "metadata": {}
     },
     {
@@ -908,7 +964,7 @@
       "skipped": false,
       "command": "bundle outdated --parseable",
       "exit_status": 1,
-      "duration_ms": 1647,
+      "duration_ms": 50,
       "metadata": {}
     }
   ]

@@ -57,6 +57,7 @@ Rails Doctor delegates to mature tools where they already do the job well:
 - Flay for duplication
 - Strong Migrations for migration safety coverage
 - Bullet or Prosopite signals captured through the configured test command
+- SimpleCov result sets for line and branch coverage metrics
 
 Rails Doctor-owned checks focus on Rails-specific gaps and synthesis:
 
@@ -67,24 +68,37 @@ Rails Doctor-owned checks focus on Rails-specific gaps and synthesis:
 - large Rails artifact hotspots
 - TODO/FIXME/HACK density
 - missing test/spec counterparts for changed app files
+- strict test coverage thresholds for aggregate and per-file coverage
 - churn + quality hotspot scoring
 - skipped-tool coverage gaps
+
+## Test Coverage Metrics
+
+`ci` and `deep` profiles read `coverage/.resultset.json` after the configured test command runs. Rails Doctor expects SimpleCov to be configured by the app test suite; `rails-doctor init` recommends the `simplecov` gem but does not edit test boot files automatically.
+
+Default thresholds are intentionally strict to make untested generated code visible:
+
+- aggregate line coverage: `90%`
+- per-file line coverage: `80%`
+- branch coverage: unset by default, enforced when configured
+
+Coverage appears in every report format. Low coverage emits normal `test-coverage` findings, so score and `--fail-on medium` gates can catch coverage regressions without a separate coverage gate.
 
 ## Output Formats
 
 The default terminal report is concise and human-readable.
 
-`--format json` is the stable public contract for agents. It includes summary data, findings, tool runs, scores, skipped tools, hotspots, metadata, fix guidance, and direct `agent_instruction` fields.
+`--format json` is the stable public contract for agents. It includes summary data, coverage metrics, findings, tool runs, scores, skipped tools, hotspots, metadata, fix guidance, and direct `agent_instruction` fields.
 
 `--format markdown` is optimized for pull request comments and GitHub Actions summaries.
 
-`--format html` produces a static self-contained dashboard with score, confidence, top fixes, filters, hotspots, agent brief, skipped tools, and raw tool output.
+`--format html` produces a static self-contained dashboard with score, confidence, coverage, top fixes, filters, hotspots, agent brief, skipped tools, and raw tool output.
 
 ## Profiles
 
 - `fast`: static/local only, no tests, no network
 - `recommended`: core static checks and configured local coverage
-- `ci`: static checks, tests, runtime warnings, and artifacts
+- `ci`: static checks, tests, runtime warnings, coverage metrics, and artifacts
 - `deep`: CI plus deep quality, dependency freshness, and hotspot detail
 
 ## GitHub Actions

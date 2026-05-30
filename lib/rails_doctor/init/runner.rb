@@ -14,6 +14,7 @@ module RailsDoctor
         "reek" => "development,test",
         "strong_migrations" => "development,test",
         "prosopite" => "development,test",
+        "simplecov" => "development,test",
         "flog" => "development,test",
         "flay" => "development,test"
       }.freeze

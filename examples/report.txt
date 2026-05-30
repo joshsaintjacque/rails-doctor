@@ -3,8 +3,13 @@ Rails Doctor
 Profile: deep
 Score: 0/100 overall, 100/100 changed files
 Confidence: 100%
-Findings: critical=1, high=10, medium=7, low=11, info=0
-Duration: 1601ms
+Coverage: 48.00% lines (threshold 90.00%)
+Findings: critical=1, high=10, medium=10, low=3, info=0
+Duration: 600ms
+
+Low coverage files
+- app/controllers/posts_controller.rb: 22.22% lines
+- app/models/post.rb: 44.44% lines
 
 Top fixes
 - [critical] SQL Injection: Possible SQL injection
@@ -33,8 +38,8 @@ Top fixes
   Implement the action or update/remove the route.
 
 Hotspots
-- app/controllers/posts_controller.rb: score 39, 7 findings, churn 0
-- app/models/post.rb: score 30, 6 findings, churn 0
-- Gemfile.lock: score 16, 10 findings, churn 0
+- app/controllers/posts_controller.rb: score 42, 8 findings, churn 0
+- app/models/post.rb: score 33, 7 findings, churn 0
+- Gemfile.lock: score 8, 2 findings, churn 0
 - db/schema.rb: score 7, 1 findings, churn 0
 - app/models/user.rb: score 7, 1 findings, churn 0

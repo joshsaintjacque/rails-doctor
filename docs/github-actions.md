@@ -22,6 +22,7 @@ The generated workflow:
 - uploads report artifacts
 - supports optional PR comments through `RAILS_DOCTOR_PR_COMMENT`
 - passes `--base origin/${{ github.base_ref || 'main' }}` for changed-file scoring
+- reads SimpleCov coverage metrics from `coverage/.resultset.json` when the configured test command generates it
 
 See [examples/github-actions/rails-doctor.yml](../examples/github-actions/rails-doctor.yml).
 
@@ -32,4 +33,4 @@ bundle exec rails-doctor --profile ci --fail-on critical
 bundle exec rails-doctor --profile ci --min-score 80
 ```
 
-Prefer `--fail-on critical` at first. Score gates are useful once a team has agreed on a baseline and understands how skipped tools affect confidence.
+Prefer `--fail-on critical` at first. Score gates are useful once a team has agreed on a baseline and understands how skipped tools affect confidence. Teams that want strict AI-generated-code guardrails can use `--fail-on medium` after SimpleCov is configured, because coverage regressions are emitted as medium-severity findings.

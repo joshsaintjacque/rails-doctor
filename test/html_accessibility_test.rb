@@ -13,6 +13,7 @@ class HtmlAccessibilityTest < Minitest::Test
       assert_includes html, '<meta name="viewport"'
       assert_includes html, '<title>Rails Doctor Report</title>'
       assert_includes html, 'aria-label="Report summary"'
+      assert_includes html, 'aria-label="Coverage summary"'
       assert_includes html, 'aria-label="Finding filters"'
       assert_match(/<button type="button" data-filter="critical"/, html)
     end

@@ -15,8 +15,13 @@ module RailsDoctor
         lines << "- Overall score: `#{@result.score&.overall || "n/a"}/100`"
         lines << "- Changed-files score: `#{@result.score&.changed_files || "n/a"}/100`"
         lines << "- Confidence: `#{@result.score&.confidence || "n/a"}%`"
+        lines << "- Coverage: `#{coverage_text}`"
         lines << "- Findings: `#{@result.findings.size}`"
         lines << "- Duration: `#{@result.duration_ms}ms`"
+        lines << ""
+        lines << "## Coverage"
+        lines << ""
+        lines.concat(coverage_lines)
         lines << ""
         lines << "## Severity Breakdown"
         lines << ""
@@ -68,6 +73,59 @@ module RailsDoctor
 
       def top_findings
         @result.findings.sort_by { |finding| -SEVERITY_WEIGHTS.fetch(finding.severity, 0) }.first(20)
+      end
+
+      def coverage_lines
+        coverage = @result.coverage
+        return ["No coverage metrics were captured."] unless coverage
+
+        unless coverage.available
+          return [
+            "- Status: `#{coverage.status}`",
+            "- Source: `#{coverage.source}`",
+            "- Report path: `#{coverage.report_path}`"
+          ]
+        end
+
+        lines = [
+          "- Line coverage: `#{format_percent(coverage.line_percent)}`",
+          "- Line threshold: `#{format_percent(threshold(:line))}`",
+          "- Covered lines: `#{coverage.covered_lines}/#{coverage.total_lines}`"
+        ]
+        lines << "- Branch coverage: `#{format_percent(coverage.branch_percent)}`" if coverage.branch_percent
+        low_files = low_coverage_files(coverage)
+        if low_files.any?
+          lines << ""
+          lines << "Low-coverage files:"
+          low_files.first(10).each do |file|
+            lines << "- `#{file.fetch(:file)}`: #{format_percent(file.fetch(:line_percent))} lines (#{file.fetch(:covered_lines)}/#{file.fetch(:total_lines)})"
+          end
+        end
+        lines
+      end
+
+      def coverage_text
+        coverage = @result.coverage
+        return "n/a" unless coverage
+        return "#{coverage.status} at #{coverage.report_path}" unless coverage.available
+
+        "#{format_percent(coverage.line_percent)} lines"
+      end
+
+      def low_coverage_files(coverage)
+        low_files = coverage.top_files.select { |file| file[:below_threshold] }
+        (coverage.changed_files_below_threshold + low_files).uniq { |file| file.fetch(:file) }
+      end
+
+      def threshold(key)
+        coverage = @result.coverage
+        coverage.thresholds[key] || coverage.thresholds[key.to_s]
+      end
+
+      def format_percent(value)
+        return "n/a" if value.nil?
+
+        format("%.2f%%", value)
       end
     end
   end

@@ -22,13 +22,13 @@ module RailsDoctor
           "deep_quality" => false
         },
         "ci" => {
-          "adapters" => %w[rubocop brakeman bundler_audit zeitwerk reek strong_migrations rails_checks test_runner],
+          "adapters" => %w[rubocop brakeman bundler_audit zeitwerk reek strong_migrations rails_checks test_runner test_coverage],
           "run_tests" => true,
           "network" => false,
           "deep_quality" => false
         },
         "deep" => {
-          "adapters" => %w[rubocop brakeman bundler_audit zeitwerk reek strong_migrations rails_checks test_runner flog flay dependency_freshness],
+          "adapters" => %w[rubocop brakeman bundler_audit zeitwerk reek strong_migrations rails_checks test_runner test_coverage flog flay dependency_freshness],
           "run_tests" => true,
           "network" => true,
           "deep_quality" => true
@@ -50,9 +50,24 @@ module RailsDoctor
         "output_dir" => "tmp/rails-doctor",
         "include_raw_output" => true
       },
+      "coverage" => {
+        "enabled" => true,
+        "source" => "simplecov",
+        "result_path" => "coverage/.resultset.json",
+        "include" => [
+          "app/**/*.rb",
+          "lib/**/*.rb"
+        ],
+        "max_files" => 10
+      },
       "thresholds" => {
         "fail_on" => nil,
         "min_score" => nil,
+        "coverage" => {
+          "line" => 90.0,
+          "file_line" => 80.0,
+          "branch" => nil
+        },
         "large_file_lines" => {
           "model" => 250,
           "controller" => 220,

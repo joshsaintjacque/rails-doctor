@@ -67,6 +67,7 @@ module RailsDoctor
         lines << "Profile: #{scan_result.profile}"
         lines << "Overall score: #{scan_result.score&.overall}"
         lines << "Changed-files score: #{scan_result.score&.changed_files}"
+        lines << coverage_brief(scan_result)
         lines << ""
         lines << "## Findings"
         findings.each do |finding|
@@ -83,6 +84,35 @@ module RailsDoctor
         lines << ""
         lines << "After changes, run Rails Doctor again and the relevant test command."
         lines.join("\n")
+      end
+
+      def coverage_brief(scan_result)
+        coverage = scan_result.coverage
+        return "Coverage: not captured" unless coverage
+        return "Coverage: #{coverage.status} at #{coverage.report_path}" unless coverage.available
+
+        lines = []
+        lines << "Coverage: #{format_percent(coverage.line_percent)} lines"
+        low_files = low_coverage_files(coverage)
+        if low_files.any?
+          lines << ""
+          lines << "## Coverage"
+          low_files.first(10).each do |file|
+            lines << "- #{file.fetch(:file)}: #{format_percent(file.fetch(:line_percent))} lines (#{file.fetch(:covered_lines)}/#{file.fetch(:total_lines)})"
+          end
+        end
+        lines.join("\n")
+      end
+
+      def low_coverage_files(coverage)
+        low_files = coverage.top_files.select { |file| file[:below_threshold] }
+        (coverage.changed_files_below_threshold + low_files).uniq { |file| file.fetch(:file) }
+      end
+
+      def format_percent(value)
+        return "n/a" if value.nil?
+
+        format("%.2f%%", value)
       end
 
       def write_brief(content)

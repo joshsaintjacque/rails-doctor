@@ -14,6 +14,7 @@ module RailsDoctor
         lines << "Profile: #{@result.profile}"
         lines << "Score: #{score_text}"
         lines << "Confidence: #{@result.score&.confidence || "n/a"}%"
+        lines << "Coverage: #{coverage_text}"
         lines << "Findings: #{severity_counts}"
         lines << "Duration: #{@result.duration_ms}ms" if @result.duration_ms
         lines << ""
@@ -23,6 +24,14 @@ module RailsDoctor
           @result.skipped_tools.each do |tool|
             lines << "- #{tool.name}: #{tool.skip_reason}"
             lines << "  #{tool.metadata[:install]}" if tool.metadata[:install]
+          end
+          lines << ""
+        end
+
+        if low_coverage_files.any?
+          lines << "Low coverage files"
+          low_coverage_files.each do |file|
+            lines << "- #{file.fetch(:file)}: #{format_percent(file.fetch(:line_percent))} lines"
           end
           lines << ""
         end
@@ -59,6 +68,29 @@ module RailsDoctor
       def severity_counts
         counts = @result.summary.fetch(:severity_counts)
         %w[critical high medium low info].map { |severity| "#{severity}=#{counts[severity]}" }.join(", ")
+      end
+
+      def coverage_text
+        coverage = @result.coverage
+        return "n/a" unless coverage
+        return "#{coverage.status} (#{coverage.report_path})" unless coverage.available
+
+        threshold = coverage.thresholds[:line] || coverage.thresholds["line"]
+        "#{format_percent(coverage.line_percent)} lines (threshold #{format_percent(threshold)})"
+      end
+
+      def low_coverage_files
+        coverage = @result.coverage
+        return [] unless coverage&.available
+
+        low_files = coverage.top_files.select { |file| file[:below_threshold] }
+        (coverage.changed_files_below_threshold + low_files).uniq { |file| file.fetch(:file) }.first(5)
+      end
+
+      def format_percent(value)
+        return "n/a" if value.nil?
+
+        format("%.2f%%", value)
       end
 
       def top_findings

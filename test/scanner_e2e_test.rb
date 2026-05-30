@@ -20,7 +20,10 @@ class ScannerE2ETest < Minitest::Test
       assert_includes categories, "database-integrity"
       assert_includes categories, "routing"
       assert_includes categories, "dependency-freshness"
+      assert_includes categories, "test-coverage"
 
+      assert result.coverage.available
+      assert_equal "below_threshold", result.coverage.status
       assert_operator result.score.overall, :<, 100
       assert(result.hotspots.any? { |hotspot| hotspot.file == "app/models/post.rb" })
       assert_empty result.skipped_tools

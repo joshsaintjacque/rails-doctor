@@ -15,9 +15,12 @@ class CLITest < Minitest::Test
         assert_equal 0, run_cli(["scan", "--profile", "deep", "--format", "html", "--output", html_path])
 
         payload = JSON.parse(File.read(json_path))
-        assert_equal "1.0", payload.fetch("schema_version")
+        assert_equal "1.1", payload.fetch("schema_version")
+        assert_equal "below_threshold", payload.fetch("coverage").fetch("status")
         assert_includes File.read(markdown_path), "# Rails Doctor Report"
+        assert_includes File.read(markdown_path), "## Coverage"
         assert_includes File.read(html_path), "Rails Doctor"
+        assert_includes File.read(html_path), "<h2>Coverage</h2>"
         assert_includes File.read(html_path), "data-filter"
       end
     end
@@ -40,6 +43,7 @@ class CLITest < Minitest::Test
 
         assert_equal 0, code
         assert_includes output.string, "Dry run only"
+        assert_includes output.string, "simplecov"
         refute File.exist?(File.join(dir, ".rails-doctor.yml"))
       end
     end
@@ -52,7 +56,9 @@ class CLITest < Minitest::Test
 
       assert_equal 0, code
       assert_includes output.string, "Invoked codex: exit 0"
-      assert Dir.glob(File.join(root, ".rails-doctor/agent-briefs/*.md")).any?
+      brief_path = Dir.glob(File.join(root, ".rails-doctor/agent-briefs/*.md")).first
+      assert brief_path
+      assert_includes File.read(brief_path), "Coverage:"
       assert Dir.glob(File.join(root, ".rails-doctor/agent-runs/*.json")).any?
     end
   end

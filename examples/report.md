@@ -4,15 +4,27 @@
 - Overall score: `0/100`
 - Changed-files score: `100/100`
 - Confidence: `100%`
-- Findings: `29`
-- Duration: `1487ms`
+- Coverage: `48.00% lines`
+- Findings: `24`
+- Duration: `600ms`
+
+## Coverage
+
+- Line coverage: `48.00%`
+- Line threshold: `90.00%`
+- Covered lines: `12/25`
+- Branch coverage: `50.00%`
+
+Low-coverage files:
+- `app/controllers/posts_controller.rb`: 22.22% lines (2/9)
+- `app/models/post.rb`: 44.44% lines (4/9)
 
 ## Severity Breakdown
 
-- `medium`: 7
+- `medium`: 10
 - `critical`: 1
 - `high`: 10
-- `low`: 11
+- `low`: 3
 
 ## Skipped Tools
 
@@ -140,16 +152,47 @@ Implement the action or update/remove the route.
 
 **Agent instruction:** Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.
 
-### MEDIUM: Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2
+### MEDIUM: DEPRECATION WARNING: old API is deprecated
 
-- Tool: `flay`
-- Category: `duplication`
-- Location: `app/models/post.rb:4`
+- Tool: `test_runner`
+- Category: `deprecation`
 - Confidence: `medium`
 
-Review whether this duplication is intentional. Extract shared behavior only if the abstraction is clear.
+Resolve deprecation warnings before framework or gem upgrades make them failures.
 
-**Agent instruction:** Do not blindly abstract. Compare the duplicated code paths, preserve semantics, and add tests if extracting shared code.
+**Agent instruction:** Update the deprecated API usage and add a regression test when behavior could change.
+
+### MEDIUM: Line coverage 48.00% is below the 90.00% threshold
+
+- Tool: `test_coverage`
+- Category: `test-coverage`
+- Confidence: `high`
+
+Add tests for uncovered application code, starting with the lowest-coverage files.
+
+**Agent instruction:** Prioritize behavior tests for uncovered app/lib code. Use the coverage metadata to start with files below the configured threshold.
+
+### MEDIUM: app/controllers/posts_controller.rb line coverage 22.22% is below the 80.00% per-file threshold
+
+- Tool: `test_coverage`
+- Category: `test-coverage`
+- Location: `app/controllers/posts_controller.rb`
+- Confidence: `high`
+
+Add focused tests that exercise the uncovered behavior in this file.
+
+**Agent instruction:** Add or update tests for this file before expanding the implementation. Prefer behavior-level tests that cover the missing branches or lines.
+
+### MEDIUM: app/models/post.rb line coverage 44.44% is below the 80.00% per-file threshold
+
+- Tool: `test_coverage`
+- Category: `test-coverage`
+- Location: `app/models/post.rb`
+- Confidence: `high`
+
+Add focused tests that exercise the uncovered behavior in this file.
+
+**Agent instruction:** Add or update tests for this file before expanding the implementation. Prefer behavior-level tests that cover the missing branches or lines.
 
 ### MEDIUM: High complexity score 32.5 for Post#publish!
 
@@ -162,15 +205,16 @@ Extract simpler methods or objects around the complex branch.
 
 **Agent instruction:** Reduce complexity with behavior-preserving extraction. Do not combine this with unrelated cleanup.
 
-### MEDIUM: DEPRECATION WARNING: old API is deprecated
+### MEDIUM: Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2
 
-- Tool: `test_runner`
-- Category: `deprecation`
+- Tool: `flay`
+- Category: `duplication`
+- Location: `app/models/post.rb:4`
 - Confidence: `medium`
 
-Resolve deprecation warnings before framework or gem upgrades make them failures.
+Review whether this duplication is intentional. Extract shared behavior only if the abstraction is clear.
 
-**Agent instruction:** Update the deprecated API usage and add a regression test when behavior could change.
+**Agent instruction:** Do not blindly abstract. Compare the duplicated code paths, preserve semantics, and add tests if extracting shared code.
 
 ### MEDIUM: 1 TODO/FIXME/HACK marker in 10 lines
 
@@ -205,45 +249,12 @@ Refactor the local smell without broad behavior changes.
 
 **Agent instruction:** Refactor only the affected method/class. Preserve public behavior and add or run tests around the changed code.
 
-### MEDIUM: Rails/TimeZone: Use Time.current instead of Time.now.
-
-- Tool: `rubocop`
-- Category: `lint`
-- Location: `app/models/post.rb:6`
-- Confidence: `high`
-
-Fix the RuboCop offense or document why this cop should be configured differently.
-
-**Agent instruction:** Apply a minimal change that satisfies Rails/TimeZone. Preserve behavior and run the relevant tests.
-
-### LOW: rubocop-rails appears to be outdated
-
-- Tool: `dependency_freshness`
-- Category: `dependency-freshness`
-- Location: `Gemfile.lock`
-- Confidence: `medium`
-
-Review the update risk and update in a separate dependency-focused change.
-
-**Agent instruction:** Do not batch this with feature work. Update rubocop-rails conservatively and run the full test suite.
-
-### LOW: strong_migrations appears to be outdated
-
-- Tool: `dependency_freshness`
-- Category: `dependency-freshness`
-- Location: `Gemfile.lock`
-- Confidence: `medium`
-
-Review the update risk and update in a separate dependency-focused change.
-
-**Agent instruction:** Do not batch this with feature work. Update strong_migrations conservatively and run the full test suite.
-
 
 ## Hotspots
 
-- `app/controllers/posts_controller.rb`: score 39, 7 findings, churn 0, changed=false
-- `app/models/post.rb`: score 30, 6 findings, churn 0, changed=false
-- `Gemfile.lock`: score 16, 10 findings, churn 0, changed=false
+- `app/controllers/posts_controller.rb`: score 42, 8 findings, churn 0, changed=false
+- `app/models/post.rb`: score 33, 7 findings, churn 0, changed=false
+- `Gemfile.lock`: score 8, 2 findings, churn 0, changed=false
 - `db/schema.rb`: score 7, 1 findings, churn 0, changed=false
 - `app/models/user.rb`: score 7, 1 findings, churn 0, changed=false
 - `config/routes.rb`: score 7, 1 findings, churn 0, changed=false

@@ -13,6 +13,7 @@ require_relative "adapters/flog"
 require_relative "adapters/flay"
 require_relative "adapters/dependency_freshness"
 require_relative "adapters/test_runner"
+require_relative "adapters/test_coverage"
 require_relative "checks/rails_checks"
 
 module RailsDoctor
@@ -28,6 +29,7 @@ module RailsDoctor
       "flay" => Adapters::Flay,
       "dependency_freshness" => Adapters::DependencyFreshness,
       "test_runner" => Adapters::TestRunner,
+      "test_coverage" => Adapters::TestCoverage,
       "rails_checks" => Checks::RailsChecks
     }.freeze
 
@@ -129,6 +131,7 @@ module RailsDoctor
       adapter_result = adapter.run
       result.tool_runs << adapter_result.fetch(:tool_run)
       result.findings.concat(adapter_result.fetch(:findings))
+      result.coverage = adapter_result[:coverage] if adapter_result[:coverage]
     rescue StandardError => error
       result.tool_runs << ToolRun.new(
         name: adapter.name,
