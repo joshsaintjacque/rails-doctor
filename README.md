@@ -10,7 +10,7 @@ It runs trusted Ruby/Rails tools, adds Rails-specific checks, and turns the resu
 
 ![Rails Doctor HTML report](site/assets/report-preview.png)
 
-![Rails Doctor demo](site/assets/demo.gif)
+![Rails Doctor CLI output](site/assets/cli-output.png)
 
 ## Quickstart
 
