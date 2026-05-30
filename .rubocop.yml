@@ -1,0 +1,16 @@
+AllCops:
+  DisabledByDefault: true
+  NewCops: enable
+  TargetRubyVersion: 3.2
+  SuggestExtensions: false
+  Exclude:
+    - "examples/**/*"
+    - "site/**/*"
+    - "test/fixtures/**/*"
+    - "output/**/*"
+
+Lint:
+  Enabled: true
+
+Security:
+  Enabled: true

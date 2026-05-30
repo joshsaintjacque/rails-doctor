@@ -61,7 +61,7 @@ module RailsDoctor
         base_ref: options[:base_ref]
       )
       output = render(result, options[:format], include_raw: options[:include_raw])
-      write_or_print(output, options[:output], config: config, format: options[:format])
+      write_or_print(output, options[:output], format: options[:format])
       threshold_exit(result, options)
     end
 
@@ -182,7 +182,7 @@ module RailsDoctor
       end
     end
 
-    def write_or_print(output, path, config:, format:)
+    def write_or_print(output, path, format:)
       if path
         FileUtils.mkdir_p(File.dirname(path))
         File.write(path, output)

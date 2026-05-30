@@ -22,6 +22,26 @@ jobs:
         env:
           RAILS_DOCTOR_CI_RAILS_VERSION: ${{ matrix.rails }}
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+      - run: bundle exec rubocop
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+      - run: bundle exec bundle-audit check --update
+
   release-dry-run:
     runs-on: ubuntu-latest
     steps:

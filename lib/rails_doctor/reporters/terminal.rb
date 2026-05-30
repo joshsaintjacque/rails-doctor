@@ -10,7 +10,7 @@ module RailsDoctor
       def render
         lines = []
         lines << "Rails Doctor"
-        lines << "=" * 12
+        lines << ("=" * 12)
         lines << "Profile: #{@result.profile}"
         lines << "Score: #{score_text}"
         lines << "Confidence: #{@result.score&.confidence || "n/a"}%"

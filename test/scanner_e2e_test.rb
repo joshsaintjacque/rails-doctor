@@ -22,7 +22,7 @@ class ScannerE2ETest < Minitest::Test
       assert_includes categories, "dependency-freshness"
 
       assert_operator result.score.overall, :<, 100
-      assert result.hotspots.any? { |hotspot| hotspot.file == "app/models/post.rb" }
+      assert(result.hotspots.any? { |hotspot| hotspot.file == "app/models/post.rb" })
       assert_empty result.skipped_tools
     end
   end
@@ -36,8 +36,8 @@ class ScannerE2ETest < Minitest::Test
         config = RailsDoctor::Config.load(project_root: dir)
         result = RailsDoctor::Scanner.new(project_root: dir, config: config, env: ENV.to_h.merge("PATH" => "")).run(profile: "recommended")
 
-        assert result.skipped_tools.any? { |tool| tool.name == "rubocop" }
-        assert result.skipped_tools.all? { |tool| tool.metadata[:install].include?("rails-doctor init") }
+        assert(result.skipped_tools.any? { |tool| tool.name == "rubocop" })
+        assert(result.skipped_tools.all? { |tool| tool.metadata[:install].include?("rails-doctor init") })
         assert_operator result.score.confidence, :<, 100
       end
     end
@@ -50,7 +50,11 @@ class ScannerE2ETest < Minitest::Test
         result = RailsDoctor::Scanner.new(project_root: root, config: config, env: test_env).run(profile: "recommended")
 
         assert_equal rails_version, result.metadata[:rails_version]
-        refute result.findings.any? { |finding| finding.category == "compatibility" && finding.message.include?("Rails #{rails_version}") }
+        refute(
+          result.findings.any? do |finding|
+            finding.category == "compatibility" && finding.message.include?("Rails #{rails_version}")
+          end
+        )
       end
     end
   end
@@ -86,9 +90,9 @@ class ScannerE2ETest < Minitest::Test
       )
 
       assert_equal ["app/models/post.rb"], result.metadata[:changed_files]
-      assert result.findings.all? { |finding| finding.file.nil? || finding.file == "app/models/post.rb" }
+      assert(result.findings.all? { |finding| finding.file.nil? || finding.file == "app/models/post.rb" })
       assert_operator result.score.changed_files, :<, 100
-      assert result.hotspots.any? { |hotspot| hotspot.file == "app/models/post.rb" && hotspot.changed }
+      assert(result.hotspots.any? { |hotspot| hotspot.file == "app/models/post.rb" && hotspot.changed })
     end
   end
 end

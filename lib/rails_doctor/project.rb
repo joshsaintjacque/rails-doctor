@@ -70,7 +70,7 @@ module RailsDoctor
     end
 
     def churn(window_days:)
-      since = (Time.now - window_days.to_i * 86_400).strftime("%Y-%m-%d")
+      since = (Time.now - (window_days.to_i * 86_400)).strftime("%Y-%m-%d")
       command = "git log --since=#{since} --name-only --pretty=format:"
       result = runner.run(command, timeout_seconds: 20)
       return {} unless result.exit_status == 0

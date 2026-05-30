@@ -293,7 +293,7 @@ module RailsDoctor
         findings
       end
 
-      def coverage_gap(category, message, missing_tool)
+      def coverage_gap(_category, message, missing_tool)
         Finding.new(
           severity: "info",
           category: "coverage-gap",

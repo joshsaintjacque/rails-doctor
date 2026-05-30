@@ -102,6 +102,8 @@ Rails Doctor targets modern Rails apps:
 
 The project test matrix covers Ruby 3.2, 3.3, and 3.4 against Rails 7.1, 7.2, and 8.x fixture scenarios where practical.
 
+The repository CI includes tests, RuboCop linting, Bundler Audit dependency checks, a gem build dry-run, and GitHub Pages deployment for the public site.
+
 ## Documentation
 
 - [CLI reference](docs/cli-reference.md)

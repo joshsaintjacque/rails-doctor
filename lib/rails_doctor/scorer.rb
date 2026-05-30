@@ -66,7 +66,7 @@ module RailsDoctor
       end
     end
 
-    def summarize_hotspot(file, findings, changed)
+    def summarize_hotspot(_file, findings, changed)
       prefix = changed ? "Changed file" : "Inherited file"
       "#{prefix} with #{findings.size} finding#{findings.size == 1 ? "" : "s"} across #{findings.map(&:category).uniq.join(", ")}."
     end
