@@ -1,10 +1,16 @@
 # Rails Doctor
 
+[![CI](https://github.com/rails-doctor/rails-doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/rails-doctor/rails-doctor/actions/workflows/ci.yml)
+[![Gem Version](https://badge.fury.io/rb/rails-doctor.svg)](https://rubygems.org/gems/rails-doctor)
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
+
 Rails Doctor is a Rails health scanner for developers, CI, and AI coding agents.
 
 It runs trusted Ruby/Rails tools, adds Rails-specific checks, and turns the results into one normalized report for humans and agents. The goal is simple: keep fast-moving AI-assisted Rails work from quietly accumulating technical debt.
 
 ![Rails Doctor HTML report](site/assets/report-preview.png)
+
+![Rails Doctor demo](site/assets/demo.gif)
 
 ## Quickstart
 
@@ -113,6 +119,7 @@ The repository CI includes tests, RuboCop linting, Bundler Audit dependency chec
 - [Adapter architecture](docs/adapter-architecture.md)
 - [Architecture diagram](docs/architecture.md)
 - [Agent handoff](docs/agent-handoff.md)
+- [Monetization path](docs/monetization.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## Static Site
