@@ -1,0 +1,31 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    brakeman (7.0.0)
+    bundler-audit (0.9.0)
+    flay (2.13.3)
+    flog (4.8.0)
+    prosopite (1.4.0)
+    rails (8.0.0)
+    reek (6.5.0)
+    rubocop (1.70.0)
+    rubocop-rails (2.28.0)
+    strong_migrations (2.0.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  brakeman
+  bundler-audit
+  flay
+  flog
+  prosopite
+  rails (~> 8.0)
+  reek
+  rubocop
+  rubocop-rails
+  strong_migrations
+
+BUNDLED WITH
+   2.6.0

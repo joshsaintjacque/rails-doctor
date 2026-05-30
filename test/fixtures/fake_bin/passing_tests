@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+puts "DEPRECATION WARNING: old API is deprecated"
+puts "Prosopite: N+1 queries detected for Post => [:user]"
+exit 0

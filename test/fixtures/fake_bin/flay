@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+puts "Similar code found in :iter (mass = 42)"
+puts "  app/models/post.rb:4"
+puts "  app/models/user.rb:2"
+exit 0

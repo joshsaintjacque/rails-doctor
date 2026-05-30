@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+if ARGV.join(" ") == "zeitwerk:check"
+  puts "Hold on, I am eager loading the application."
+  puts "All is good!"
+  exit 0
+end
+
+warn "unknown rails command"
+exit 1

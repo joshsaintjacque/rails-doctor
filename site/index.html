@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rails Doctor</title>
+  <meta name="description" content="Rails health reports for developers, CI, and AI coding agents.">
+  <style>
+    :root {
+      --ink: #151515;
+      --paper: #f7f5f0;
+      --muted: #6f6a61;
+      --line: #d8d0c3;
+      --teal: #0f766e;
+      --teal-dark: #0b4f4a;
+      --white: #fffdf8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    .hero {
+      position: relative;
+      min-height: 92svh;
+      background: #11100e;
+      color: var(--white);
+      display: grid;
+      align-items: end;
+      padding: 28px clamp(20px, 5vw, 78px) 54px;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(90deg, rgba(17,16,14,1) 0%, rgba(17,16,14,.96) 35%, rgba(17,16,14,.48) 62%, rgba(17,16,14,.2) 100%);
+    }
+    .hero-visual {
+      position: absolute;
+      z-index: 0;
+      top: 8svh;
+      right: -4vw;
+      width: min(920px, 62vw);
+      height: 78svh;
+      overflow: hidden;
+      opacity: .82;
+      transform: rotate(-1deg);
+      box-shadow: 0 30px 120px rgba(0,0,0,.45);
+    }
+    .hero-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top left;
+      display: block;
+    }
+    nav {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 22px clamp(20px, 5vw, 78px);
+      color: var(--white);
+    }
+    nav div { display: flex; gap: 22px; align-items: center; }
+    nav a {
+      text-decoration: none;
+      color: rgba(255,253,248,.84);
+    }
+    .mark { font-weight: 800; }
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      animation: rise .7s ease-out both;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(58px, 12vw, 148px);
+      line-height: .84;
+      letter-spacing: 0;
+    }
+    .lede {
+      max-width: 620px;
+      font-size: clamp(18px, 2.2vw, 24px);
+      color: rgba(255,253,248,.82);
+      margin: 0 0 28px;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid rgba(255,255,255,.34);
+      text-decoration: none;
+      background: var(--white);
+      color: var(--ink);
+      transition: transform .18s ease, background .18s ease;
+    }
+    .button.secondary { background: transparent; color: var(--white); }
+    .button:hover { transform: translateY(-2px); }
+    main { overflow: hidden; }
+    section {
+      padding: 82px clamp(20px, 5vw, 78px);
+      border-top: 1px solid var(--line);
+    }
+    .grid {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
+      gap: clamp(32px, 7vw, 96px);
+      align-items: start;
+    }
+    .eyebrow {
+      color: var(--teal);
+      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .12em;
+      margin: 0 0 12px;
+    }
+    h2 { font-size: clamp(34px, 5vw, 70px); line-height: .96; margin: 0; letter-spacing: 0; }
+    .copy { color: var(--muted); font-size: 18px; max-width: 680px; margin: 0 0 24px; }
+    .steps {
+      display: grid;
+      border-top: 1px solid var(--line);
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .num { color: var(--teal); font-weight: 900; font-size: 30px; }
+    .step strong { display: block; margin-bottom: 6px; }
+    .terminal {
+      background: var(--ink);
+      color: var(--white);
+      padding: 22px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      box-shadow: 0 26px 80px rgba(0,0,0,.18);
+    }
+    .terminal span { color: #8fd8d0; }
+    .band {
+      background: var(--ink);
+      color: var(--white);
+    }
+    .band .copy { color: rgba(255,253,248,.72); }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid rgba(255,255,255,.22);
+    }
+    .metric {
+      padding: 22px 18px 0 0;
+      min-height: 120px;
+    }
+    .metric strong { display: block; font-size: 44px; line-height: 1; }
+    .final {
+      min-height: 52svh;
+      display: grid;
+      align-items: center;
+      text-align: left;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 840px) {
+      nav { align-items: flex-start; font-size: 14px; padding: 22px 24px; }
+      nav div { gap: 13px; }
+      .hero { min-height: 88svh; }
+      .hero::after { background: linear-gradient(180deg, rgba(17,16,14,.92), rgba(17,16,14,.76)); }
+      .hero-visual { inset: 16svh -24vw auto auto; width: 110vw; height: 58svh; opacity: .22; }
+      .hero-inner { max-width: calc(100vw - 48px); }
+      h1 { font-size: 56px; }
+      .lede { font-size: 18px; max-width: 320px; }
+      .grid { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr; }
+      .step { grid-template-columns: 54px minmax(0, 1fr); }
+    }
+    @media (max-width: 700px) {
+      nav div a:nth-child(n+2) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="mark" href="#">Rails Doctor</a>
+    <div>
+      <a href="https://github.com/rails-doctor/rails-doctor#readme">Docs</a>
+      <a href="https://github.com/rails-doctor/rails-doctor/blob/main/examples/report.html">Report</a>
+      <a href="https://github.com/rails-doctor/rails-doctor">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-visual" aria-hidden="true">
+      <img src="assets/report-preview.png" alt="">
+    </div>
+    <div class="hero-inner">
+      <h1>Rails Doctor</h1>
+      <p class="lede">A Rails health report for humans, CI, and AI coding agents.</p>
+      <div class="actions">
+        <a class="button" href="https://github.com/rails-doctor/rails-doctor#readme">Read the README</a>
+        <a class="button secondary" href="https://github.com/rails-doctor/rails-doctor/blob/main/examples/report.html">Open a report</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="grid">
+        <div>
+          <p class="eyebrow">The gap</p>
+          <h2>Fast agents need guardrails.</h2>
+        </div>
+        <div>
+          <p class="copy">Rails teams already trust RuboCop, Brakeman, Bundler Audit, Reek, Flog, Flay, Strong Migrations, and runtime test signals. Rails Doctor turns that scattered output into one score, one report, and one agent-ready repair brief.</p>
+          <div class="terminal">
+            <div><span>$</span> rails-doctor --profile ci --format html</div>
+            <div>Score: 82/100 overall</div>
+            <div>Changed files: 67/100</div>
+            <div>Top fix: posts.user_id has no index</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="grid">
+        <div>
+          <p class="eyebrow">Workflow</p>
+          <h2>One model. Four reports. Explicit repair.</h2>
+        </div>
+        <div class="steps">
+          <div class="step"><div class="num">01</div><div><strong>Scan</strong><p class="copy">Run mature tools and Rails-specific checks without mutating the repository.</p></div></div>
+          <div class="step"><div class="num">02</div><div><strong>Normalize</strong><p class="copy">Convert every issue into severity, confidence, fix guidance, and agent instruction fields.</p></div></div>
+          <div class="step"><div class="num">03</div><div><strong>Report</strong><p class="copy">Emit terminal, JSON, Markdown, and static HTML from the same source of truth.</p></div></div>
+          <div class="step"><div class="num">04</div><div><strong>Handoff</strong><p class="copy">Send filtered findings to Codex, Claude Code, or Cursor only when explicitly requested.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="grid">
+        <div>
+          <p class="eyebrow">CI-ready</p>
+          <h2>Designed for PRs generated by people and agents.</h2>
+        </div>
+        <div>
+          <p class="copy">Rails Doctor separates inherited debt from changed-file risk, uploads report artifacts, and supports thresholds like critical-finding gates or minimum score checks.</p>
+          <div class="metrics">
+            <div class="metric"><strong>4</strong> report formats</div>
+            <div class="metric"><strong>10+</strong> scanner signals</div>
+            <div class="metric"><strong>0</strong> surprise mutations</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="grid">
+        <div>
+          <p class="eyebrow">Open source</p>
+          <h2>Free local scanner. Paid team layer later.</h2>
+        </div>
+        <div>
+          <p class="copy">The CLI stays useful under MIT. The future commercial path is hosted report history, team policies, GitHub App checks, and agent remediation queues.</p>
+          <a class="button" href="https://github.com/rails-doctor/rails-doctor#readme">Start with the CLI</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

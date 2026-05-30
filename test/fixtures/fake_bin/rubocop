@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+require "json"
+puts JSON.generate({
+  "files" => [
+    {
+      "path" => "app/models/post.rb",
+      "offenses" => [
+        {
+          "severity" => "warning",
+          "message" => "Use Time.current instead of Time.now.",
+          "cop_name" => "Rails/TimeZone",
+          "location" => { "line" => 6 }
+        }
+      ]
+    }
+  ]
+})
+exit 1

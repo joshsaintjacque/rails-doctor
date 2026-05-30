@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+brief = ARGV.first
+puts "fake agent received #{brief}"
+exit File.exist?(brief) ? 0 : 1

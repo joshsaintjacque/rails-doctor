@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+require "json"
+puts JSON.generate([
+  {
+    "context" => "Post#publish!",
+    "lines" => [4],
+    "message" => "has the smell of too many statements",
+    "smell_type" => "TooManyStatements",
+    "source" => "app/models/post.rb"
+  }
+])
+exit 2

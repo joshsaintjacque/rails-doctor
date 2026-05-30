@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+require "json"
+puts JSON.generate({
+  "warnings" => [
+    {
+      "warning_type" => "SQL Injection",
+      "message" => "Possible SQL injection",
+      "file" => "app/models/post.rb",
+      "line" => 8,
+      "confidence" => "High",
+      "fingerprint" => "abc123",
+      "link" => "https://brakemanscanner.org/docs/warning_types/sql_injection/"
+    }
+  ]
+})
+exit 3

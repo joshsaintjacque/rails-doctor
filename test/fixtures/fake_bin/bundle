@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+if ARGV.first == "outdated"
+  puts "rack (newest 3.0.0, installed 2.2.0)"
+  exit 1
+end
+
+warn "fake bundle only supports outdated"
+exit 1

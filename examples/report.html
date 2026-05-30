@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rails Doctor Report</title>
+  <style>
+    :root {
+      --bg: #f7f5f0;
+      --ink: #171717;
+      --muted: #68645e;
+      --panel: #fffdf8;
+      --line: #d8d2c7;
+      --accent: #0f766e;
+      --critical: #9f1239;
+      --high: #b45309;
+      --medium: #0369a1;
+      --low: #4d7c0f;
+      --info: #52525b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+    header {
+      min-height: 360px;
+      padding: 48px clamp(24px, 6vw, 80px);
+      background:
+        linear-gradient(120deg, rgba(15, 118, 110, 0.18), transparent 42%),
+        linear-gradient(180deg, #161616 0%, #29251f 100%);
+      color: #fffdf8;
+      display: grid;
+      align-items: end;
+    }
+    .hero {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr);
+      gap: 48px;
+      align-items: end;
+    }
+    .brand { font-size: clamp(48px, 9vw, 116px); line-height: .88; letter-spacing: 0; margin: 0 0 18px; }
+    .subtitle { max-width: 620px; color: #d8d2c7; font-size: 18px; margin: 0; }
+    .score-ring {
+      border: 1px solid rgba(255,255,255,.24);
+      padding: 28px;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(8px);
+    }
+    .score-number { font-size: clamp(64px, 10vw, 120px); line-height: .9; font-weight: 800; }
+    .score-label { color: #d8d2c7; text-transform: uppercase; font-size: 12px; letter-spacing: .12em; }
+    main { max-width: 1180px; margin: 0 auto; padding: 36px clamp(20px, 4vw, 48px) 80px; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 36px;
+    }
+    .metric { padding: 18px 16px; border-right: 1px solid var(--line); }
+    .metric:last-child { border-right: 0; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+    .metric strong { display: block; margin-top: 6px; font-size: 28px; }
+    .section { margin: 44px 0; }
+    .section h2 { font-size: 28px; margin: 0 0 16px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 24px; }
+    .filters button {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      padding: 8px 12px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .filters button.active { background: var(--ink); color: var(--bg); }
+    table { width: 100%; border-collapse: collapse; background: var(--panel); }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .chip { display: inline-block; padding: 3px 8px; color: white; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .critical { background: var(--critical); }
+    .high { background: var(--high); }
+    .medium { background: var(--medium); }
+    .low { background: var(--low); }
+    .info { background: var(--info); }
+    .top-fix {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 18px;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+    }
+    .agent {
+      background: #171717;
+      color: #f7f5f0;
+      padding: 20px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+    }
+    details { border-top: 1px solid var(--line); padding: 14px 0; }
+    summary { cursor: pointer; font-weight: 700; }
+    pre { white-space: pre-wrap; overflow: auto; background: #171717; color: #f7f5f0; padding: 16px; }
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric { border-bottom: 1px solid var(--line); }
+      table, thead, tbody, tr, th, td { display: block; }
+      thead { display: none; }
+      tr { border-bottom: 1px solid var(--line); padding: 10px 0; }
+      td { border: 0; }
+      .top-fix { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <div>
+        <h1 class="brand">Rails Doctor</h1>
+        <p class="subtitle">A Rails health report for developers, CI, and AI coding agents. Generated from normalized scanner findings, runtime signals, and Rails-specific checks.</p>
+      </div>
+      <div class="score-ring">
+        <div class="score-label">Overall health</div>
+        <div class="score-number">0</div>
+        <div>Changed files: <strong>100</strong> · Confidence: <strong>100%</strong></div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="metrics" aria-label="Report summary">
+      <div class="metric"><span>Critical</span><strong>1</strong></div>
+      <div class="metric"><span>High</span><strong>10</strong></div>
+      <div class="metric"><span>Medium</span><strong>7</strong></div>
+      <div class="metric"><span>Skipped</span><strong>0</strong></div>
+      <div class="metric"><span>Duration</span><strong>422ms</strong></div>
+    </section>
+
+    <section class="section">
+      <h2>Top Fixes</h2>
+      
+      
+        <article class="top-fix">
+          <div><span class="chip critical">critical</span></div>
+          <div>
+            <strong>SQL Injection: Possible SQL injection</strong>
+            <div>app/models/post.rb:8</div>
+            <p>Review Brakeman guidance: https://brakemanscanner.org/docs/warning_types/sql_injection/</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>rack: Example vulnerability</strong>
+            <div>Gemfile.lock</div>
+            <p>Update rack to a patched version and rerun Bundler Audit.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Route points to missing posts#update</strong>
+            <div>app/controllers/posts_controller.rb</div>
+            <p>Implement the action or update/remove the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Prosopite: N+1 queries detected for Post =&gt; [:user]</strong>
+            
+            <p>Fix the N+1 query by eager loading or adjusting the query path exercised by tests.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>posts.user_id has no index</strong>
+            <div>db/schema.rb</div>
+            <p>Add an index for the foreign key column to avoid slow association lookups.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>users.email has a Rails uniqueness validation without a unique database index</strong>
+            <div>app/models/user.rb</div>
+            <p>Back uniqueness validations with a unique index to prevent race-condition duplicates.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Routes reference missing ghosts_controller.rb</strong>
+            <div>config/routes.rb</div>
+            <p>Create the controller or remove/rename the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Route points to missing posts#create</strong>
+            <div>app/controllers/posts_controller.rb</div>
+            <p>Implement the action or update/remove the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Route points to missing posts#destroy</strong>
+            <div>app/controllers/posts_controller.rb</div>
+            <p>Implement the action or update/remove the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Route points to missing posts#new</strong>
+            <div>app/controllers/posts_controller.rb</div>
+            <p>Implement the action or update/remove the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip high">high</span></div>
+          <div>
+            <strong>Route points to missing posts#edit</strong>
+            <div>app/controllers/posts_controller.rb</div>
+            <p>Implement the action or update/remove the route.</p>
+          </div>
+        </article>
+      
+        <article class="top-fix">
+          <div><span class="chip medium">medium</span></div>
+          <div>
+            <strong>Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2</strong>
+            <div>app/models/post.rb:4</div>
+            <p>Review whether this duplication is intentional. Extract shared behavior only if the abstraction is clear.</p>
+          </div>
+        </article>
+      
+    </section>
+
+    <section class="section">
+      <h2>Agent Brief</h2>
+      <div class="agent">- critical: Fix this security finding with the smallest behavior-preserving change. Prefer framework-safe APIs and add regression tests.\n- high: Update the vulnerable gem conservatively, refresh the lockfile, and run the test suite.\n- high: Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.\n- high: Use includes/preload/eager_load or query restructuring. Verify with the same test command.\n- high: Create a migration that adds an index on posts.user_id. For PostgreSQL production apps, prefer a concurrent index path compatible with strong_migrations.\n- high: Add a unique index migration for users.email, handle existing duplicate data if necessary, and rerun tests.\n- high: Align routes with real controller names. Prefer removing stale routes over creating empty controllers.\n- high: Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.\n- high: Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.\n- high: Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.\n- high: Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.\n- medium: Do not blindly abstract. Compare the duplicated code paths, preserve semantics, and add tests if extracting shared code.</div>
+    </section>
+
+    <section class="section">
+      <h2>Findings</h2>
+      <div class="filters" role="toolbar" aria-label="Finding filters">
+        
+          <button type="button" data-filter="all" class="active">All</button>
+        
+          <button type="button" data-filter="critical" class="">Critical</button>
+        
+          <button type="button" data-filter="high" class="">High</button>
+        
+          <button type="button" data-filter="medium" class="">Medium</button>
+        
+          <button type="button" data-filter="low" class="">Low</button>
+        
+          <button type="button" data-filter="info" class="">Info</button>
+        
+      </div>
+      <table>
+        <thead><tr><th>Severity</th><th>Tool</th><th>Category</th><th>Location</th><th>Finding</th></tr></thead>
+        <tbody>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>rubocop</td>
+              <td>lint</td>
+              <td>app/models/post.rb:6</td>
+              <td><strong>Rails/TimeZone: Use Time.current instead of Time.now.</strong><br>Fix the RuboCop offense or document why this cop should be configured differently.</td>
+            </tr>
+          
+            <tr data-severity="critical">
+              <td><span class="chip critical">critical</span></td>
+              <td>brakeman</td>
+              <td>security</td>
+              <td>app/models/post.rb:8</td>
+              <td><strong>SQL Injection: Possible SQL injection</strong><br>Review Brakeman guidance: https://brakemanscanner.org/docs/warning_types/sql_injection/</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>bundler_audit</td>
+              <td>dependency-security</td>
+              <td>Gemfile.lock</td>
+              <td><strong>rack: Example vulnerability</strong><br>Update rack to a patched version and rerun Bundler Audit.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>reek</td>
+              <td>code-smell</td>
+              <td>app/models/post.rb:4</td>
+              <td><strong>TooManyStatements: has the smell of too many statements</strong><br>Refactor the local smell without broad behavior changes.</td>
+            </tr>
+          
+            <tr data-severity="low">
+              <td><span class="chip low">low</span></td>
+              <td>strong_migrations</td>
+              <td>migration-safety</td>
+              <td>config/initializers/strong_migrations.rb</td>
+              <td><strong>strong_migrations is installed but no initializer was found</strong><br>Generate or review the Strong Migrations initializer so project-specific safety settings are explicit.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>database-integrity</td>
+              <td>db/schema.rb</td>
+              <td><strong>posts.user_id has no index</strong><br>Add an index for the foreign key column to avoid slow association lookups.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>database-integrity</td>
+              <td>app/models/user.rb</td>
+              <td><strong>users.email has a Rails uniqueness validation without a unique database index</strong><br>Back uniqueness validations with a unique index to prevent race-condition duplicates.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>config/routes.rb</td>
+              <td><strong>Routes reference missing ghosts_controller.rb</strong><br>Create the controller or remove/rename the route.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>Route points to missing posts#create</strong><br>Implement the action or update/remove the route.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>Route points to missing posts#destroy</strong><br>Implement the action or update/remove the route.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>Route points to missing posts#edit</strong><br>Implement the action or update/remove the route.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>Route points to missing posts#new</strong><br>Implement the action or update/remove the route.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>posts#show has no matching template or explicit response</strong><br>Add a template or explicit render/redirect/head response.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>rails_checks</td>
+              <td>routing</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>Route points to missing posts#update</strong><br>Implement the action or update/remove the route.</td>
+            </tr>
+          
+            <tr data-severity="low">
+              <td><span class="chip low">low</span></td>
+              <td>rails_checks</td>
+              <td>dead-code</td>
+              <td>app/controllers/posts_controller.rb</td>
+              <td><strong>posts#archive is not referenced by simple route analysis</strong><br>Review whether this action is reached by custom routing or can be removed.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>rails_checks</td>
+              <td>technical-debt</td>
+              <td>app/models/post.rb</td>
+              <td><strong>1 TODO/FIXME/HACK marker in 10 lines</strong><br>Convert stale markers into tracked work or resolve them while the context is fresh.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>test_runner</td>
+              <td>deprecation</td>
+              <td>1</td>
+              <td><strong>DEPRECATION WARNING: old API is deprecated</strong><br>Resolve deprecation warnings before framework or gem upgrades make them failures.</td>
+            </tr>
+          
+            <tr data-severity="high">
+              <td><span class="chip high">high</span></td>
+              <td>test_runner</td>
+              <td>runtime-n-plus-one</td>
+              <td>2</td>
+              <td><strong>Prosopite: N+1 queries detected for Post =&gt; [:user]</strong><br>Fix the N+1 query by eager loading or adjusting the query path exercised by tests.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>flog</td>
+              <td>complexity</td>
+              <td>app/models/post.rb:4</td>
+              <td><strong>High complexity score 32.5 for Post#publish!</strong><br>Extract simpler methods or objects around the complex branch.</td>
+            </tr>
+          
+            <tr data-severity="medium">
+              <td><span class="chip medium">medium</span></td>
+              <td>flay</td>
+              <td>duplication</td>
+              <td>app/models/post.rb:4</td>
+              <td><strong>Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2</strong><br>Review whether this duplication is intentional. Extract shared behavior only if the abstraction is clear.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Hotspots</h2>
+      <table>
+        <thead><tr><th>File</th><th>Score</th><th>Findings</th><th>Churn</th><th>Changed</th><th>Summary</th></tr></thead>
+        <tbody>
+          
+            <tr>
+              <td>app/controllers/posts_controller.rb</td>
+              <td>39</td>
+              <td>7</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 7 findings across routing, dead-code.</td>
+            </tr>
+          
+            <tr>
+              <td>app/models/post.rb</td>
+              <td>30</td>
+              <td>6</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 6 findings across lint, security, code-smell, technical-debt, complexity, duplication.</td>
+            </tr>
+          
+            <tr>
+              <td>Gemfile.lock</td>
+              <td>7</td>
+              <td>1</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 1 finding across dependency-security.</td>
+            </tr>
+          
+            <tr>
+              <td>db/schema.rb</td>
+              <td>7</td>
+              <td>1</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 1 finding across database-integrity.</td>
+            </tr>
+          
+            <tr>
+              <td>app/models/user.rb</td>
+              <td>7</td>
+              <td>1</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 1 finding across database-integrity.</td>
+            </tr>
+          
+            <tr>
+              <td>config/routes.rb</td>
+              <td>7</td>
+              <td>1</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 1 finding across routing.</td>
+            </tr>
+          
+            <tr>
+              <td>config/initializers/strong_migrations.rb</td>
+              <td>1</td>
+              <td>1</td>
+              <td>0</td>
+              <td>false</td>
+              <td>Inherited file with 1 finding across migration-safety.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>Skipped Tools</h2>
+      
+        <p>No tools were skipped.</p>
+      
+    </section>
+
+    <section class="section">
+      <h2>Raw Tool Output</h2>
+      
+      
+        <details>
+          <summary>rubocop</summary>
+          <pre>{&quot;files&quot;:[{&quot;path&quot;:&quot;app/models/post.rb&quot;,&quot;offenses&quot;:[{&quot;severity&quot;:&quot;warning&quot;,&quot;message&quot;:&quot;Use Time.current instead of Time.now.&quot;,&quot;cop_name&quot;:&quot;Rails/TimeZone&quot;,&quot;location&quot;:{&quot;line&quot;:6}}]}]}
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>brakeman</summary>
+          <pre>{&quot;warnings&quot;:[{&quot;warning_type&quot;:&quot;SQL Injection&quot;,&quot;message&quot;:&quot;Possible SQL injection&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:8,&quot;confidence&quot;:&quot;High&quot;,&quot;fingerprint&quot;:&quot;abc123&quot;,&quot;link&quot;:&quot;https://brakemanscanner.org/docs/warning_types/sql_injection/&quot;}]}
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>bundler_audit</summary>
+          <pre>{&quot;results&quot;:[{&quot;gem&quot;:{&quot;name&quot;:&quot;rack&quot;},&quot;advisory&quot;:{&quot;id&quot;:&quot;CVE-2099-0001&quot;,&quot;title&quot;:&quot;Example vulnerability&quot;,&quot;criticality&quot;:&quot;high&quot;,&quot;url&quot;:&quot;https://example.test/advisory&quot;}}]}
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>zeitwerk</summary>
+          <pre>Hold on, I am eager loading the application.
+All is good!
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>reek</summary>
+          <pre>[{&quot;context&quot;:&quot;Post#publish!&quot;,&quot;lines&quot;:[4],&quot;message&quot;:&quot;has the smell of too many statements&quot;,&quot;smell_type&quot;:&quot;TooManyStatements&quot;,&quot;source&quot;:&quot;app/models/post.rb&quot;}]
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>test_runner</summary>
+          <pre>DEPRECATION WARNING: old API is deprecated
+Prosopite: N+1 queries detected for Post =&gt; [:user]
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>flog</summary>
+          <pre>  32.5 Post#publish! app/models/post.rb:4
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>flay</summary>
+          <pre>Similar code found in :iter (mass = 42)
+  app/models/post.rb:4
+  app/models/user.rb:2
+\n</pre>
+        </details>
+      
+        <details>
+          <summary>dependency_freshness</summary>
+          <pre>\n/System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/rubygems.rb:283:in `find_spec_for_exe&#39;: Could not find &#39;bundler&#39; (2.6.0) required by your /Users/joshs/Documents/Codex/2026-05-30/is-there-an-equivalent-to-npx/rails-doctor/test/fixtures/rails_apps/sample_app/Gemfile.lock. (Gem::GemNotFoundException)
+To update to the latest version installed on your system, run `bundle update --bundler`.
+To install the missing version, run `gem install bundler:2.6.0`
+	from /System/Library/Frameworks/Ruby.framework/Versions/2.6/usr/lib/ruby/2.6.0/rubygems.rb:302:in `activate_bin_path&#39;
+	from /usr/bin/bundle:23:in `&lt;main&gt;&#39;
+</pre>
+        </details>
+      
+    </section>
+  </main>
+  <script type="application/json" id="rails-doctor-data">{&quot;schema_version&quot;:&quot;1.0&quot;,&quot;generated_at&quot;:&quot;2026-05-30T09:44:59-07:00&quot;,&quot;project_root&quot;:&quot;/Users/joshs/Documents/Codex/2026-05-30/is-there-an-equivalent-to-npx/rails-doctor/test/fixtures/rails_apps/sample_app&quot;,&quot;profile&quot;:&quot;deep&quot;,&quot;metadata&quot;:{&quot;rails_app&quot;:true,&quot;ruby_version&quot;:&quot;2.6.10&quot;,&quot;changed_files&quot;:[]},&quot;summary&quot;:{&quot;profile&quot;:&quot;deep&quot;,&quot;duration_ms&quot;:422,&quot;finding_count&quot;:20,&quot;severity_counts&quot;:{&quot;medium&quot;:7,&quot;critical&quot;:1,&quot;high&quot;:10,&quot;low&quot;:2},&quot;skipped_tools&quot;:[],&quot;score&quot;:{&quot;overall&quot;:0,&quot;changed_files&quot;:100,&quot;confidence&quot;:100,&quot;penalties&quot;:[{&quot;id&quot;:&quot;rd-uxugzbwo6zhv&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;Rails/TimeZone: Use Time.current instead of Time.now.&quot;,&quot;penalty&quot;:3.0},{&quot;id&quot;:&quot;rd-4ortq0vuq8ub&quot;,&quot;severity&quot;:&quot;critical&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;SQL Injection: Possible SQL injection&quot;,&quot;penalty&quot;:15.0},{&quot;id&quot;:&quot;rd-6f0d502p9a9v&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;Gemfile.lock&quot;,&quot;message&quot;:&quot;rack: Example vulnerability&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-ogli1wwm9w84&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;TooManyStatements: has the smell of too many statements&quot;,&quot;penalty&quot;:3.0},{&quot;id&quot;:&quot;rd-4bu1zueau0hv&quot;,&quot;severity&quot;:&quot;low&quot;,&quot;file&quot;:&quot;config/initializers/strong_migrations.rb&quot;,&quot;message&quot;:&quot;strong_migrations is installed but no initializer was found&quot;,&quot;penalty&quot;:0.75},{&quot;id&quot;:&quot;rd-flrqpupl5rlb&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;db/schema.rb&quot;,&quot;message&quot;:&quot;posts.user_id has no index&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-4q8qzfsek9yx&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/models/user.rb&quot;,&quot;message&quot;:&quot;users.email has a Rails uniqueness validation without a unique database index&quot;,&quot;penalty&quot;:5.25},{&quot;id&quot;:&quot;rd-tgbw7hgas6jf&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;config/routes.rb&quot;,&quot;message&quot;:&quot;Routes reference missing ghosts_controller.rb&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-jakptpazfe0o&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#create&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-69i8ed36ne4t&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#destroy&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-lmzdjrql325f&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#edit&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-tp71fidf93lx&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#new&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-woeypue627p1&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;posts#show has no matching template or explicit response&quot;,&quot;penalty&quot;:2.25},{&quot;id&quot;:&quot;rd-xll1glcvwleq&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#update&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-g8dcc0hut4ck&quot;,&quot;severity&quot;:&quot;low&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;posts#archive is not referenced by simple route analysis&quot;,&quot;penalty&quot;:0.4},{&quot;id&quot;:&quot;rd-4ckc38kyes7l&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;1 TODO/FIXME/HACK marker in 10 lines&quot;,&quot;penalty&quot;:2.25},{&quot;id&quot;:&quot;rd-4jdeutkg8uth&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:null,&quot;message&quot;:&quot;DEPRECATION WARNING: old API is deprecated&quot;,&quot;penalty&quot;:2.25},{&quot;id&quot;:&quot;rd-x7gveqq9qb4t&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:null,&quot;message&quot;:&quot;Prosopite: N+1 queries detected for Post =&gt; [:user]&quot;,&quot;penalty&quot;:5.25},{&quot;id&quot;:&quot;rd-9vzwjuitagq5&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;High complexity score 32.5 for Post#publish!&quot;,&quot;penalty&quot;:2.25},{&quot;id&quot;:&quot;rd-nkggalcod2uu&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2&quot;,&quot;penalty&quot;:2.25}],&quot;top_score_movers&quot;:[{&quot;id&quot;:&quot;rd-4ortq0vuq8ub&quot;,&quot;severity&quot;:&quot;critical&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;message&quot;:&quot;SQL Injection: Possible SQL injection&quot;,&quot;penalty&quot;:15.0},{&quot;id&quot;:&quot;rd-xll1glcvwleq&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#update&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-6f0d502p9a9v&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;Gemfile.lock&quot;,&quot;message&quot;:&quot;rack: Example vulnerability&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-lmzdjrql325f&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#edit&quot;,&quot;penalty&quot;:7.0},{&quot;id&quot;:&quot;rd-69i8ed36ne4t&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;message&quot;:&quot;Route points to missing posts#destroy&quot;,&quot;penalty&quot;:7.0}]}},&quot;findings&quot;:[{&quot;id&quot;:&quot;rd-uxugzbwo6zhv&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;lint&quot;,&quot;tool&quot;:&quot;rubocop&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:6,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Rails/TimeZone: Use Time.current instead of Time.now.&quot;,&quot;recommendation&quot;:&quot;Fix the RuboCop offense or document why this cop should be configured differently.&quot;,&quot;agent_instruction&quot;:&quot;Apply a minimal change that satisfies Rails/TimeZone. Preserve behavior and run the relevant tests.&quot;,&quot;suggested_commands&quot;:[&quot;bundle exec rubocop app/models/post.rb&quot;],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-4ortq0vuq8ub&quot;,&quot;severity&quot;:&quot;critical&quot;,&quot;category&quot;:&quot;security&quot;,&quot;tool&quot;:&quot;brakeman&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:8,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;SQL Injection: Possible SQL injection&quot;,&quot;recommendation&quot;:&quot;Review Brakeman guidance: https://brakemanscanner.org/docs/warning_types/sql_injection/&quot;,&quot;agent_instruction&quot;:&quot;Fix this security finding with the smallest behavior-preserving change. Prefer framework-safe APIs and add regression tests.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{&quot;fingerprint&quot;:&quot;abc123&quot;}},{&quot;id&quot;:&quot;rd-6f0d502p9a9v&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;dependency-security&quot;,&quot;tool&quot;:&quot;bundler_audit&quot;,&quot;file&quot;:&quot;Gemfile.lock&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;rack: Example vulnerability&quot;,&quot;recommendation&quot;:&quot;Update rack to a patched version and rerun Bundler Audit.&quot;,&quot;agent_instruction&quot;:&quot;Update the vulnerable gem conservatively, refresh the lockfile, and run the test suite.&quot;,&quot;suggested_commands&quot;:[&quot;bundle update rack&quot;,&quot;bundle exec bundle-audit check&quot;],&quot;metadata&quot;:{&quot;advisory&quot;:&quot;CVE-2099-0001&quot;,&quot;url&quot;:&quot;https://example.test/advisory&quot;}},{&quot;id&quot;:&quot;rd-ogli1wwm9w84&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;code-smell&quot;,&quot;tool&quot;:&quot;reek&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:4,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;TooManyStatements: has the smell of too many statements&quot;,&quot;recommendation&quot;:&quot;Refactor the local smell without broad behavior changes.&quot;,&quot;agent_instruction&quot;:&quot;Refactor only the affected method/class. Preserve public behavior and add or run tests around the changed code.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{&quot;context&quot;:&quot;Post#publish!&quot;,&quot;smell_type&quot;:&quot;TooManyStatements&quot;}},{&quot;id&quot;:&quot;rd-4bu1zueau0hv&quot;,&quot;severity&quot;:&quot;low&quot;,&quot;category&quot;:&quot;migration-safety&quot;,&quot;tool&quot;:&quot;strong_migrations&quot;,&quot;file&quot;:&quot;config/initializers/strong_migrations.rb&quot;,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;strong_migrations is installed but no initializer was found&quot;,&quot;recommendation&quot;:&quot;Generate or review the Strong Migrations initializer so project-specific safety settings are explicit.&quot;,&quot;agent_instruction&quot;:&quot;Add the standard Strong Migrations initializer only after checking project database adapter and deployment practices.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-flrqpupl5rlb&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;database-integrity&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;db/schema.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;posts.user_id has no index&quot;,&quot;recommendation&quot;:&quot;Add an index for the foreign key column to avoid slow association lookups.&quot;,&quot;agent_instruction&quot;:&quot;Create a migration that adds an index on posts.user_id. For PostgreSQL production apps, prefer a concurrent index path compatible with strong_migrations.&quot;,&quot;suggested_commands&quot;:[&quot;bin/rails generate migration AddIndexToPostsUserId&quot;],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-4q8qzfsek9yx&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;database-integrity&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/models/user.rb&quot;,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;users.email has a Rails uniqueness validation without a unique database index&quot;,&quot;recommendation&quot;:&quot;Back uniqueness validations with a unique index to prevent race-condition duplicates.&quot;,&quot;agent_instruction&quot;:&quot;Add a unique index migration for users.email, handle existing duplicate data if necessary, and rerun tests.&quot;,&quot;suggested_commands&quot;:[&quot;bin/rails generate migration AddUniqueIndexToUsersEmail&quot;],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-tgbw7hgas6jf&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;config/routes.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Routes reference missing ghosts_controller.rb&quot;,&quot;recommendation&quot;:&quot;Create the controller or remove/rename the route.&quot;,&quot;agent_instruction&quot;:&quot;Align routes with real controller names. Prefer removing stale routes over creating empty controllers.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-jakptpazfe0o&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Route points to missing posts#create&quot;,&quot;recommendation&quot;:&quot;Implement the action or update/remove the route.&quot;,&quot;agent_instruction&quot;:&quot;Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-69i8ed36ne4t&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Route points to missing posts#destroy&quot;,&quot;recommendation&quot;:&quot;Implement the action or update/remove the route.&quot;,&quot;agent_instruction&quot;:&quot;Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-lmzdjrql325f&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Route points to missing posts#edit&quot;,&quot;recommendation&quot;:&quot;Implement the action or update/remove the route.&quot;,&quot;agent_instruction&quot;:&quot;Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-tp71fidf93lx&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Route points to missing posts#new&quot;,&quot;recommendation&quot;:&quot;Implement the action or update/remove the route.&quot;,&quot;agent_instruction&quot;:&quot;Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-woeypue627p1&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;posts#show has no matching template or explicit response&quot;,&quot;recommendation&quot;:&quot;Add a template or explicit render/redirect/head response.&quot;,&quot;agent_instruction&quot;:&quot;Inspect the action intent. Add the missing view or explicit response and cover the route with a request/controller test.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-xll1glcvwleq&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;routing&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;high&quot;,&quot;message&quot;:&quot;Route points to missing posts#update&quot;,&quot;recommendation&quot;:&quot;Implement the action or update/remove the route.&quot;,&quot;agent_instruction&quot;:&quot;Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-g8dcc0hut4ck&quot;,&quot;severity&quot;:&quot;low&quot;,&quot;category&quot;:&quot;dead-code&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;confidence&quot;:&quot;low&quot;,&quot;message&quot;:&quot;posts#archive is not referenced by simple route analysis&quot;,&quot;recommendation&quot;:&quot;Review whether this action is reached by custom routing or can be removed.&quot;,&quot;agent_instruction&quot;:&quot;Do not remove this action automatically. First search routes, tests, links, and callers for dynamic usage.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-4ckc38kyes7l&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;technical-debt&quot;,&quot;tool&quot;:&quot;rails_checks&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;1 TODO/FIXME/HACK marker in 10 lines&quot;,&quot;recommendation&quot;:&quot;Convert stale markers into tracked work or resolve them while the context is fresh.&quot;,&quot;agent_instruction&quot;:&quot;Do not delete markers without addressing or preserving the underlying work item. Prefer resolving changed-file markers.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-4jdeutkg8uth&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;deprecation&quot;,&quot;tool&quot;:&quot;test_runner&quot;,&quot;line&quot;:1,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;DEPRECATION WARNING: old API is deprecated&quot;,&quot;recommendation&quot;:&quot;Resolve deprecation warnings before framework or gem upgrades make them failures.&quot;,&quot;agent_instruction&quot;:&quot;Update the deprecated API usage and add a regression test when behavior could change.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-x7gveqq9qb4t&quot;,&quot;severity&quot;:&quot;high&quot;,&quot;category&quot;:&quot;runtime-n-plus-one&quot;,&quot;tool&quot;:&quot;test_runner&quot;,&quot;line&quot;:2,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;Prosopite: N+1 queries detected for Post =&gt; [:user]&quot;,&quot;recommendation&quot;:&quot;Fix the N+1 query by eager loading or adjusting the query path exercised by tests.&quot;,&quot;agent_instruction&quot;:&quot;Use includes/preload/eager_load or query restructuring. Verify with the same test command.&quot;,&quot;suggested_commands&quot;:[&quot;../../fake_bin/passing_tests&quot;],&quot;metadata&quot;:{}},{&quot;id&quot;:&quot;rd-9vzwjuitagq5&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;complexity&quot;,&quot;tool&quot;:&quot;flog&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:4,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;High complexity score 32.5 for Post#publish!&quot;,&quot;recommendation&quot;:&quot;Extract simpler methods or objects around the complex branch.&quot;,&quot;agent_instruction&quot;:&quot;Reduce complexity with behavior-preserving extraction. Do not combine this with unrelated cleanup.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{&quot;flog_score&quot;:32.5}},{&quot;id&quot;:&quot;rd-nkggalcod2uu&quot;,&quot;severity&quot;:&quot;medium&quot;,&quot;category&quot;:&quot;duplication&quot;,&quot;tool&quot;:&quot;flay&quot;,&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;line&quot;:4,&quot;confidence&quot;:&quot;medium&quot;,&quot;message&quot;:&quot;Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2&quot;,&quot;recommendation&quot;:&quot;Review whether this duplication is intentional. Extract shared behavior only if the abstraction is clear.&quot;,&quot;agent_instruction&quot;:&quot;Do not blindly abstract. Compare the duplicated code paths, preserve semantics, and add tests if extracting shared code.&quot;,&quot;suggested_commands&quot;:[],&quot;metadata&quot;:{&quot;locations&quot;:[&quot;app/models/post.rb:4&quot;,&quot;app/models/user.rb:2&quot;]}}],&quot;hotspots&quot;:[{&quot;file&quot;:&quot;app/controllers/posts_controller.rb&quot;,&quot;score&quot;:39,&quot;finding_count&quot;:7,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;dead-code&quot;,&quot;routing&quot;],&quot;summary&quot;:&quot;Inherited file with 7 findings across routing, dead-code.&quot;},{&quot;file&quot;:&quot;app/models/post.rb&quot;,&quot;score&quot;:30,&quot;finding_count&quot;:6,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;code-smell&quot;,&quot;complexity&quot;,&quot;duplication&quot;,&quot;lint&quot;,&quot;security&quot;,&quot;technical-debt&quot;],&quot;summary&quot;:&quot;Inherited file with 6 findings across lint, security, code-smell, technical-debt, complexity, duplication.&quot;},{&quot;file&quot;:&quot;Gemfile.lock&quot;,&quot;score&quot;:7,&quot;finding_count&quot;:1,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;dependency-security&quot;],&quot;summary&quot;:&quot;Inherited file with 1 finding across dependency-security.&quot;},{&quot;file&quot;:&quot;db/schema.rb&quot;,&quot;score&quot;:7,&quot;finding_count&quot;:1,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;database-integrity&quot;],&quot;summary&quot;:&quot;Inherited file with 1 finding across database-integrity.&quot;},{&quot;file&quot;:&quot;app/models/user.rb&quot;,&quot;score&quot;:7,&quot;finding_count&quot;:1,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;database-integrity&quot;],&quot;summary&quot;:&quot;Inherited file with 1 finding across database-integrity.&quot;},{&quot;file&quot;:&quot;config/routes.rb&quot;,&quot;score&quot;:7,&quot;finding_count&quot;:1,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;routing&quot;],&quot;summary&quot;:&quot;Inherited file with 1 finding across routing.&quot;},{&quot;file&quot;:&quot;config/initializers/strong_migrations.rb&quot;,&quot;score&quot;:1,&quot;finding_count&quot;:1,&quot;churn&quot;:0,&quot;changed&quot;:false,&quot;categories&quot;:[&quot;migration-safety&quot;],&quot;summary&quot;:&quot;Inherited file with 1 finding across migration-safety.&quot;}],&quot;tool_runs&quot;:[{&quot;name&quot;:&quot;rubocop&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/rubocop&quot;,&quot;exit_status&quot;:1,&quot;duration_ms&quot;:44,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;brakeman&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/brakeman&quot;,&quot;exit_status&quot;:3,&quot;duration_ms&quot;:46,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;bundler_audit&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/bundle-audit&quot;,&quot;exit_status&quot;:1,&quot;duration_ms&quot;:43,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;zeitwerk&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/rails zeitwerk:check&quot;,&quot;exit_status&quot;:0,&quot;duration_ms&quot;:40,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;reek&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/reek&quot;,&quot;exit_status&quot;:2,&quot;duration_ms&quot;:42,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;strong_migrations&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;exit_status&quot;:0,&quot;metadata&quot;:{&quot;coverage&quot;:&quot;strong_migrations gem detected&quot;,&quot;initializer_present&quot;:false}},{&quot;name&quot;:&quot;rails_checks&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;exit_status&quot;:0,&quot;metadata&quot;:{&quot;checks&quot;:[&quot;indexes&quot;,&quot;uniqueness&quot;,&quot;routes&quot;,&quot;views&quot;,&quot;size&quot;,&quot;todos&quot;,&quot;tests&quot;,&quot;coverage-gaps&quot;]}},{&quot;name&quot;:&quot;test_runner&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/passing_tests&quot;,&quot;exit_status&quot;:0,&quot;duration_ms&quot;:40,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;flog&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/flog&quot;,&quot;exit_status&quot;:0,&quot;duration_ms&quot;:39,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;flay&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;../../fake_bin/flay&quot;,&quot;exit_status&quot;:0,&quot;duration_ms&quot;:39,&quot;metadata&quot;:{}},{&quot;name&quot;:&quot;dependency_freshness&quot;,&quot;available&quot;:true,&quot;skipped&quot;:false,&quot;command&quot;:&quot;bundle outdated --parseable&quot;,&quot;exit_status&quot;:1,&quot;duration_ms&quot;:38,&quot;metadata&quot;:{}}]}</script>
+  <script>
+    document.querySelectorAll("[data-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-filter]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        const filter = button.dataset.filter;
+        document.querySelectorAll("tr[data-severity]").forEach((row) => {
+          row.style.display = filter === "all" || row.dataset.severity === filter ? "" : "none";
+        });
+      });
+    });
+  </script>
+</body>
+</html>

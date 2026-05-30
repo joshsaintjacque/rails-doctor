@@ -1,0 +1,15 @@
+version: 1
+commands:
+  rubocop: ../../fake_bin/rubocop
+  brakeman: ../../fake_bin/brakeman
+  bundler_audit: ../../fake_bin/bundle-audit
+  zeitwerk: ../../fake_bin/rails zeitwerk:check
+  reek: ../../fake_bin/reek
+  flog: ../../fake_bin/flog
+  flay: ../../fake_bin/flay
+  dependency_freshness: bundle outdated --parseable
+  test: ../../fake_bin/passing_tests
+agents:
+  codex:
+    command: ../../fake_bin/fake_agent
+    apply_requires_clean_worktree: true
