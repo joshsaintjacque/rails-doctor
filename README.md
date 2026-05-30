@@ -118,9 +118,12 @@ The repository CI includes tests, RuboCop linting, Bundler Audit dependency chec
 - [Scoring model](docs/scoring-model.md)
 - [Adapter architecture](docs/adapter-architecture.md)
 - [Architecture diagram](docs/architecture.md)
+- [GitHub Actions](docs/github-actions.md)
 - [Agent handoff](docs/agent-handoff.md)
 - [Monetization path](docs/monetization.md)
 - [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Release process](RELEASE.md)
 
 ## Static Site
 

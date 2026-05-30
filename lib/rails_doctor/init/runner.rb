@@ -118,6 +118,8 @@ module RailsDoctor
                   ruby: ["3.2", "3.3", "3.4"]
               steps:
                 - uses: actions/checkout@v4
+                  with:
+                    fetch-depth: 0
                 - uses: ruby/setup-ruby@v1
                   with:
                     ruby-version: ${{ matrix.ruby }}
