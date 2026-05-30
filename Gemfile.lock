@@ -14,7 +14,7 @@ GEM
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     minitest (5.27.0)
-    parallel (2.0.1)
+    parallel (1.28.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
@@ -50,7 +50,7 @@ PLATFORMS
 DEPENDENCIES
   bundler-audit (~> 0.9)
   minitest (~> 5.20)
-  parallel (< 2.1)
+  parallel (< 2.0)
   rails-doctor!
   rake (~> 13.0)
   rubocop (~> 1.70)
