@@ -1,6 +1,6 @@
 # Rails Doctor
 
-[![CI](https://github.com/rails-doctor/rails-doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/rails-doctor/rails-doctor/actions/workflows/ci.yml)
+[![CI](https://github.com/joshsaintjacque/rails-doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/joshsaintjacque/rails-doctor/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/rails-doctor.svg)](https://rubygems.org/gems/rails-doctor)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
 
