@@ -38,22 +38,32 @@ module RailsDoctor
       @project = Project.new(root: @project_root, runner: @runner)
     end
 
-    def run(profile: "recommended", changed_only: false)
+    def run(profile: "recommended", changed_only: false, base_ref: nil)
+      effective_base_ref = base_ref || @config.data.fetch("git", {})["base_ref"]
+      changed_files = @project.changed_files(base_ref: effective_base_ref)
       result = ScanResult.new(
         project_root: @project_root,
         profile: profile,
-        metadata: metadata
+        metadata: metadata(changed_files: changed_files, base_ref: effective_base_ref)
       )
+
+      result.findings.concat(compatibility_findings)
 
       @config.adapters_for(profile).each do |name|
         adapter_class = ADAPTERS.fetch(name) { raise Error, "Unknown adapter #{name}" }
-        adapter = adapter_class.new(project: @project, config: @config, runner: @runner, profile: profile)
+        adapter = adapter_class.new(
+          project: @project,
+          config: @config,
+          runner: @runner,
+          profile: profile,
+          changed_files: changed_files
+        )
         run_adapter(adapter, result)
       end
 
       result.findings = deduplicate(result.findings)
-      result.findings = filter_changed(result.findings) if changed_only
-      scorer = Scorer.new(project: @project, config: @config)
+      result.findings = filter_changed(result.findings, changed_files) if changed_only
+      scorer = Scorer.new(project: @project, config: @config, changed_files: changed_files)
       result.hotspots = scorer.hotspots(result.findings)
       result.score = scorer.score(result)
       result.finish!
@@ -61,13 +71,45 @@ module RailsDoctor
 
     private
 
-    def metadata
+    def metadata(changed_files:, base_ref:)
       {
         rails_app: @project.rails_app?,
         ruby_version: RUBY_VERSION,
+        rails_version: @project.rails_version,
         branch: @project.current_branch,
-        changed_files: @project.changed_files
+        base_ref: base_ref,
+        changed_files: changed_files
       }.compact
+    end
+
+    def compatibility_findings
+      findings = []
+      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.2.0")
+        findings << Finding.new(
+          severity: "critical",
+          category: "compatibility",
+          tool: "rails-doctor",
+          confidence: "high",
+          message: "Ruby #{RUBY_VERSION} is below Rails Doctor's supported minimum of Ruby 3.2",
+          recommendation: "Run Rails Doctor with Ruby 3.2 or newer.",
+          agent_instruction: "Do not change application code for this finding. Switch the Ruby runtime to 3.2+ and rerun Rails Doctor."
+        )
+      end
+
+      rails_version = @project.rails_version
+      if rails_version && Gem::Version.new(rails_version) < Gem::Version.new("7.1.0")
+        findings << Finding.new(
+          severity: "critical",
+          category: "compatibility",
+          tool: "rails-doctor",
+          confidence: "high",
+          message: "Rails #{rails_version} is below Rails Doctor's supported minimum of Rails 7.1",
+          recommendation: "Upgrade Rails or use a version of Rails Doctor that explicitly supports legacy Rails.",
+          agent_instruction: "Do not apply automated fixes to this legacy Rails app based on Rails Doctor output until compatibility is addressed."
+        )
+      end
+
+      findings
     end
 
     def run_adapter(adapter, result)
@@ -121,9 +163,8 @@ module RailsDoctor
       end.values
     end
 
-    def filter_changed(findings)
-      changed = @project.changed_files
-      findings.select { |finding| finding.file.nil? || changed.include?(finding.file) }
+    def filter_changed(findings, changed_files)
+      findings.select { |finding| finding.file.nil? || changed_files.include?(finding.file) }
     end
   end
 end

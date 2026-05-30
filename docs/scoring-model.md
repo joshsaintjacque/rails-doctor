@@ -18,4 +18,4 @@ Confidence changes penalty weight:
 
 Skipped tools reduce report confidence rather than directly penalizing the health score. Reports show `overall_score` and `changed_files_score` so teams can separate inherited debt from new PR risk.
 
-Hotspots combine severity-weighted findings, Git churn, and changed-file status.
+Hotspots combine severity-weighted findings, Git churn, and changed-file status. In CI, pass `--base origin/main` or configure `git.base_ref` so changed-file score and hotspots are computed against the pull request base.

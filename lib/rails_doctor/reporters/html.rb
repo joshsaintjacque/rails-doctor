@@ -13,7 +13,7 @@ module RailsDoctor
       end
 
       def render
-        ERB.new(template, trim_mode: "-").result(binding)
+        ERB.new(template, trim_mode: "-").result(binding).gsub(/[ \t]+$/, "")
       end
 
       private

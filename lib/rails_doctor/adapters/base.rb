@@ -5,13 +5,14 @@ require "json"
 module RailsDoctor
   module Adapters
     class Base
-      attr_reader :project, :config, :runner, :profile
+      attr_reader :project, :config, :runner, :profile, :changed_files
 
-      def initialize(project:, config:, runner:, profile:)
+      def initialize(project:, config:, runner:, profile:, changed_files: [])
         @project = project
         @config = config
         @runner = runner
         @profile = profile
+        @changed_files = changed_files
       end
 
       def name

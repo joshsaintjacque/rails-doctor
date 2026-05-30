@@ -57,7 +57,8 @@ module RailsDoctor
       config = Config.load(project_root: Dir.pwd, path: options[:config])
       result = Scanner.new(project_root: Dir.pwd, config: config, env: @env).run(
         profile: options[:profile],
-        changed_only: options[:changed_only]
+        changed_only: options[:changed_only],
+        base_ref: options[:base_ref]
       )
       output = render(result, options[:format], include_raw: options[:include_raw])
       write_or_print(output, options[:output], config: config, format: options[:format])
@@ -82,8 +83,10 @@ module RailsDoctor
       project = Project.new(root: Dir.pwd, runner: runner)
       result = Scanner.new(project_root: Dir.pwd, config: config, env: @env).run(
         profile: options[:profile],
-        changed_only: options[:changed_only]
+        changed_only: options[:changed_only],
+        base_ref: options[:base_ref]
       )
+      options[:changed_files] = result.metadata[:changed_files]
       output = Agent::Handoff.new(
         agent_name: agent_name,
         project: project,
@@ -119,6 +122,7 @@ module RailsDoctor
         parser.on("--output PATH") { |value| options[:output] = value }
         parser.on("--config PATH") { |value| options[:config] = value }
         parser.on("--changed-only") { options[:changed_only] = true }
+        parser.on("--base REF") { |value| options[:base_ref] = value }
         parser.on("--include-raw") { options[:include_raw] = true }
         parser.on("--fail-on SEVERITY") { |value| options[:fail_on] = value }
         parser.on("--min-score SCORE", Integer) { |value| options[:min_score] = value }
@@ -161,6 +165,7 @@ module RailsDoctor
         parser.on("--severity SEVERITY") { |value| options[:severity] = value }
         parser.on("--max-findings N", Integer) { |value| options[:max_findings] = value }
         parser.on("--changed-only") { options[:changed_only] = true }
+        parser.on("--base REF") { |value| options[:base_ref] = value }
         parser.on("--apply") { options[:apply] = true }
         parser.on("--allow-dirty") { options[:allow_dirty] = true }
       end.parse!(@argv)
@@ -211,7 +216,7 @@ module RailsDoctor
         Rails Doctor #{VERSION}
 
         Usage:
-          rails-doctor [scan] [--profile recommended] [--format terminal|json|markdown|html]
+          rails-doctor [scan] [--profile recommended] [--format terminal|json|markdown|html] [--base origin/main]
           rails-doctor init [--dry-run] [--yes] [--install] [--ci]
           rails-doctor agent codex [--severity high] [--apply]
           rails-doctor validate-config

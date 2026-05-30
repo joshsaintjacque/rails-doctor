@@ -2,13 +2,13 @@
 
 module RailsDoctor
   class Scorer
-    def initialize(project:, config:)
+    def initialize(project:, config:, changed_files: [])
       @project = project
       @config = config
+      @changed_files = changed_files
     end
 
     def score(result)
-      changed_files = @project.changed_files
       penalties = result.findings.map do |finding|
         weight = SEVERITY_WEIGHTS.fetch(finding.severity, 3)
         confidence_multiplier = confidence_multiplier(finding.confidence)
@@ -17,7 +17,7 @@ module RailsDoctor
       end
 
       total_penalty = penalties.sum { |item| item[:penalty] }
-      changed_penalty = result.findings.select { |finding| changed_files.include?(finding.file) }
+      changed_penalty = result.findings.select { |finding| @changed_files.include?(finding.file) }
         .sum { |finding| SEVERITY_WEIGHTS.fetch(finding.severity, 3) * confidence_multiplier(finding.confidence) }
 
       skipped = result.skipped_tools.size
@@ -34,7 +34,7 @@ module RailsDoctor
 
     def hotspots(findings)
       churn = @project.churn(window_days: @config.data.fetch("git").fetch("churn_window_days"))
-      changed = @project.changed_files
+      changed = @changed_files
       by_file = findings.select(&:file).group_by(&:file)
 
       by_file.map do |file, file_findings|

@@ -22,6 +22,7 @@ thresholds:
   min_score:
 git:
   churn_window_days: 90
+  base_ref:
 agents:
   codex:
     command: codex exec
@@ -31,3 +32,5 @@ agents:
 Profiles let teams choose fast local scans, CI coverage, or deeper quality analysis. Commands are strings because projects often run tools through Bundler, binstubs, Docker, or custom scripts.
 
 Dependency freshness checks should only run in profiles where the team accepts network or cache use.
+
+Set `git.base_ref` or pass `--base origin/main` in CI to compute changed-file scores against a pull request base instead of only considering uncommitted local changes.

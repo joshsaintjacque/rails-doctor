@@ -64,7 +64,8 @@ module RailsDoctor
         "flog_high_score" => 25.0
       },
       "git" => {
-        "churn_window_days" => 90
+        "churn_window_days" => 90,
+        "base_ref" => nil
       },
       "agents" => {
         "codex" => {

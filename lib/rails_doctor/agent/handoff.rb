@@ -53,7 +53,7 @@ module RailsDoctor
           threshold = SEVERITY_WEIGHTS.fetch(options[:severity], 0)
           filtered = filtered.select { |finding| SEVERITY_WEIGHTS.fetch(finding.severity, 0) >= threshold }
         end
-        filtered = filtered.select { |finding| project.changed_files.include?(finding.file) } if options[:changed_only]
+        filtered = filtered.select { |finding| Array(options[:changed_files]).include?(finding.file) } if options[:changed_only]
         filtered.first(options.fetch(:max_findings, 10))
       end
 

@@ -5,13 +5,14 @@ module RailsDoctor
     class RailsChecks
       NAME = "rails_checks"
 
-      attr_reader :project, :config, :runner, :profile
+      attr_reader :project, :config, :runner, :profile, :changed_files
 
-      def initialize(project:, config:, runner:, profile:)
+      def initialize(project:, config:, runner:, profile:, changed_files: [])
         @project = project
         @config = config
         @runner = runner
         @profile = profile
+        @changed_files = changed_files
       end
 
       def name
@@ -257,7 +258,7 @@ module RailsDoctor
       end
 
       def missing_test_counterparts
-        changed = project.changed_files
+        changed = changed_files
         return [] if changed.empty?
 
         changed.grep(%r{\Aapp/(models|controllers|jobs|mailers)/.+\.rb\z}).each_with_object([]) do |file, findings|

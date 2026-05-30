@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "shellwords"
+
 module RailsDoctor
   class Project
     attr_reader :root, :runner
@@ -25,6 +27,18 @@ module RailsDoctor
       end
     end
 
+    def gem_version(name)
+      lockfile = join("Gemfile.lock")
+      return nil unless File.exist?(lockfile)
+
+      escaped = Regexp.escape(name)
+      File.read(lockfile)[/^\s{4}#{escaped} \(([^)]+)\)/, 1]
+    end
+
+    def rails_version
+      gem_version("rails")
+    end
+
     def command_available?(name)
       runner.executable?(name) || File.executable?(join("bin/#{name}"))
     end
@@ -41,7 +55,12 @@ module RailsDoctor
       result.exit_status == 0 && !result.stdout.strip.empty?
     end
 
-    def changed_files
+    def changed_files(base_ref: nil)
+      if base_ref && !base_ref.to_s.strip.empty?
+        result = runner.run("git diff --name-only #{base_ref.shellescape}...HEAD", timeout_seconds: 20)
+        return result.stdout.lines.map(&:strip).uniq.reject(&:empty?) if result.exit_status == 0
+      end
+
       names = []
       ["git diff --name-only", "git diff --cached --name-only"].each do |command|
         result = runner.run(command, timeout_seconds: 10)

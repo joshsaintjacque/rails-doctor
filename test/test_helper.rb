@@ -23,11 +23,12 @@ module RailsDoctorTestHelpers
     fixture_path("fake_bin", name)
   end
 
-  def with_sample_app
+  def with_sample_app(rails_version: "8.0.0")
     Dir.mktmpdir("rails-doctor-sample") do |dir|
       source = fixture_path("rails_apps", "sample_app")
       target = File.join(dir, "sample_app")
       FileUtils.cp_r(source, target)
+      write_rails_version(target, rails_version)
       write_test_config(target)
       Dir.chdir(target) { yield target }
     end
@@ -49,6 +50,20 @@ module RailsDoctorTestHelpers
     )
     config["agents"]["codex"]["command"] = fake_bin("fake_agent")
     File.write(File.join(root, ".rails-doctor.yml"), config.to_yaml)
+  end
+
+  def write_rails_version(root, version)
+    gemfile = File.join(root, "Gemfile")
+    lockfile = File.join(root, "Gemfile.lock")
+    schema = File.join(root, "db/schema.rb")
+
+    File.write(gemfile, File.read(gemfile).sub(/gem "rails", "~> [^"]+"/, "gem \"rails\", \"~> #{version[/\A\d+\.\d+/]}\""))
+    File.write(lockfile, File.read(lockfile).sub(/rails \([^)]+\)/, "rails (#{version})").sub(/rails \(~> [^)]+\)/, "rails (~> #{version[/\A\d+\.\d+/]})"))
+    File.write(schema, File.read(schema).sub(/ActiveRecord::Schema\[[^\]]+\]/, "ActiveRecord::Schema[#{version[/\A\d+\.\d+/]}]"))
+  end
+
+  def git!(command, root)
+    system(command, chdir: root, out: File::NULL, err: File::NULL) || skip("git command failed: #{command}")
   end
 
   def test_env

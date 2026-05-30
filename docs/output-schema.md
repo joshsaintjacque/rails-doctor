@@ -30,3 +30,5 @@ Each finding contains:
 - `metadata`
 
 Agents should treat `agent_instruction` and `suggested_commands` as guidance, not permission to mutate code. Mutation only occurs through an explicit agent workflow outside JSON report generation.
+
+`metadata` includes detected Ruby and Rails versions, current branch, optional base ref, and changed files used for changed-file scoring.

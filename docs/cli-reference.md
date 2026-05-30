@@ -11,6 +11,7 @@ Options:
 - `--output PATH`
 - `--config PATH`
 - `--changed-only`
+- `--base REF`
 - `--include-raw`
 - `--fail-on info|low|medium|high|critical`
 - `--min-score N`
@@ -38,6 +39,7 @@ Options:
 - `--severity SEVERITY`
 - `--max-findings N`
 - `--changed-only`
+- `--base REF`
 - `--apply`
 - `--allow-dirty`
 

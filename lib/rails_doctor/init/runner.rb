@@ -105,6 +105,10 @@ module RailsDoctor
             pull_request:
             workflow_dispatch:
 
+          permissions:
+            contents: read
+            pull-requests: write
+
           jobs:
             rails-doctor:
               runs-on: ubuntu-latest
@@ -118,11 +122,17 @@ module RailsDoctor
                   with:
                     ruby-version: ${{ matrix.ruby }}
                     bundler-cache: true
-                - run: bundle exec rails-doctor --profile ci --format markdown --output tmp/rails-doctor/summary.md
-                - run: bundle exec rails-doctor --profile ci --format json --output tmp/rails-doctor/report.json
-                - run: bundle exec rails-doctor --profile ci --format html --output tmp/rails-doctor/report.html
+                - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format markdown --output tmp/rails-doctor/summary.md
+                - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format json --output tmp/rails-doctor/report.json
+                - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format html --output tmp/rails-doctor/report.html
                 - name: Rails Doctor summary
                   run: cat tmp/rails-doctor/summary.md >> "$GITHUB_STEP_SUMMARY"
+                - name: Optional PR comment
+                  if: github.event_name == 'pull_request' && vars.RAILS_DOCTOR_PR_COMMENT == 'true'
+                  run: gh pr comment "$PR_URL" --body-file tmp/rails-doctor/summary.md
+                  env:
+                    GH_TOKEN: ${{ github.token }}
+                    PR_URL: ${{ github.event.pull_request.html_url }}
                 - uses: actions/upload-artifact@v4
                   with:
                     name: rails-doctor-${{ matrix.ruby }}

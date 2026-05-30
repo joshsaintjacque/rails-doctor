@@ -26,6 +26,7 @@ Generate reports:
 rails-doctor --format json --output tmp/rails-doctor/report.json
 rails-doctor --format markdown --output tmp/rails-doctor/summary.md
 rails-doctor --format html --output tmp/rails-doctor/report.html
+rails-doctor --profile ci --base origin/main --changed-only
 ```
 
 Hand high-severity findings to an agent explicitly:
@@ -82,7 +83,7 @@ The default terminal report is concise and human-readable.
 
 ## GitHub Actions
 
-`rails-doctor init --ci` can generate a workflow that runs Rails Doctor on pull requests, writes a Markdown job summary, and uploads JSON/Markdown/HTML artifacts.
+`rails-doctor init --ci` can generate a workflow that runs Rails Doctor on pull requests, writes a Markdown job summary, and uploads JSON/Markdown/HTML artifacts. Use `--base origin/main` or the generated workflow's base-ref expression to separate inherited debt from changed-file risk.
 
 You can gate PRs:
 
@@ -111,6 +112,10 @@ The project test matrix covers Ruby 3.2, 3.3, and 3.4 against Rails 7.1, 7.2, an
 - [Architecture diagram](docs/architecture.md)
 - [Agent handoff](docs/agent-handoff.md)
 - [Contributing](CONTRIBUTING.md)
+
+## Static Site
+
+The public marketing site lives in [site/index.html](site/index.html). The repository includes a GitHub Pages workflow that deploys the static site from `site/` on pushes to `main`.
 
 ## Monetization Posture
 

@@ -4,15 +4,15 @@
 - Overall score: `0/100`
 - Changed-files score: `100/100`
 - Confidence: `100%`
-- Findings: `20`
-- Duration: `417ms`
+- Findings: `29`
+- Duration: `1487ms`
 
 ## Severity Breakdown
 
 - `medium`: 7
 - `critical`: 1
 - `high`: 10
-- `low`: 2
+- `low`: 11
 
 ## Skipped Tools
 
@@ -41,17 +41,6 @@ Review Brakeman guidance: https://brakemanscanner.org/docs/warning_types/sql_inj
 Update rack to a patched version and rerun Bundler Audit.
 
 **Agent instruction:** Update the vulnerable gem conservatively, refresh the lockfile, and run the test suite.
-
-### HIGH: Route points to missing posts#update
-
-- Tool: `rails_checks`
-- Category: `routing`
-- Location: `app/controllers/posts_controller.rb`
-- Confidence: `high`
-
-Implement the action or update/remove the route.
-
-**Agent instruction:** Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.
 
 ### HIGH: Prosopite: N+1 queries detected for Post => [:user]
 
@@ -118,6 +107,17 @@ Implement the action or update/remove the route.
 
 **Agent instruction:** Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.
 
+### HIGH: Route points to missing posts#edit
+
+- Tool: `rails_checks`
+- Category: `routing`
+- Location: `app/controllers/posts_controller.rb`
+- Confidence: `high`
+
+Implement the action or update/remove the route.
+
+**Agent instruction:** Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.
+
 ### HIGH: Route points to missing posts#new
 
 - Tool: `rails_checks`
@@ -129,7 +129,7 @@ Implement the action or update/remove the route.
 
 **Agent instruction:** Do not add an empty action. Determine the intended route behavior, then implement or remove the stale route.
 
-### HIGH: Route points to missing posts#edit
+### HIGH: Route points to missing posts#update
 
 - Tool: `rails_checks`
 - Category: `routing`
@@ -151,28 +151,6 @@ Review whether this duplication is intentional. Extract shared behavior only if 
 
 **Agent instruction:** Do not blindly abstract. Compare the duplicated code paths, preserve semantics, and add tests if extracting shared code.
 
-### MEDIUM: TooManyStatements: has the smell of too many statements
-
-- Tool: `reek`
-- Category: `code-smell`
-- Location: `app/models/post.rb:4`
-- Confidence: `high`
-
-Refactor the local smell without broad behavior changes.
-
-**Agent instruction:** Refactor only the affected method/class. Preserve public behavior and add or run tests around the changed code.
-
-### MEDIUM: posts#show has no matching template or explicit response
-
-- Tool: `rails_checks`
-- Category: `routing`
-- Location: `app/controllers/posts_controller.rb`
-- Confidence: `medium`
-
-Add a template or explicit render/redirect/head response.
-
-**Agent instruction:** Inspect the action intent. Add the missing view or explicit response and cover the route with a request/controller test.
-
 ### MEDIUM: High complexity score 32.5 for Post#publish!
 
 - Tool: `flog`
@@ -184,16 +162,15 @@ Extract simpler methods or objects around the complex branch.
 
 **Agent instruction:** Reduce complexity with behavior-preserving extraction. Do not combine this with unrelated cleanup.
 
-### MEDIUM: Rails/TimeZone: Use Time.current instead of Time.now.
+### MEDIUM: DEPRECATION WARNING: old API is deprecated
 
-- Tool: `rubocop`
-- Category: `lint`
-- Location: `app/models/post.rb:6`
-- Confidence: `high`
+- Tool: `test_runner`
+- Category: `deprecation`
+- Confidence: `medium`
 
-Fix the RuboCop offense or document why this cop should be configured differently.
+Resolve deprecation warnings before framework or gem upgrades make them failures.
 
-**Agent instruction:** Apply a minimal change that satisfies Rails/TimeZone. Preserve behavior and run the relevant tests.
+**Agent instruction:** Update the deprecated API usage and add a regression test when behavior could change.
 
 ### MEDIUM: 1 TODO/FIXME/HACK marker in 10 lines
 
@@ -206,44 +183,67 @@ Convert stale markers into tracked work or resolve them while the context is fre
 
 **Agent instruction:** Do not delete markers without addressing or preserving the underlying work item. Prefer resolving changed-file markers.
 
-### MEDIUM: DEPRECATION WARNING: old API is deprecated
-
-- Tool: `test_runner`
-- Category: `deprecation`
-- Confidence: `medium`
-
-Resolve deprecation warnings before framework or gem upgrades make them failures.
-
-**Agent instruction:** Update the deprecated API usage and add a regression test when behavior could change.
-
-### LOW: posts#archive is not referenced by simple route analysis
+### MEDIUM: posts#show has no matching template or explicit response
 
 - Tool: `rails_checks`
-- Category: `dead-code`
+- Category: `routing`
 - Location: `app/controllers/posts_controller.rb`
-- Confidence: `low`
-
-Review whether this action is reached by custom routing or can be removed.
-
-**Agent instruction:** Do not remove this action automatically. First search routes, tests, links, and callers for dynamic usage.
-
-### LOW: strong_migrations is installed but no initializer was found
-
-- Tool: `strong_migrations`
-- Category: `migration-safety`
-- Location: `config/initializers/strong_migrations.rb`
 - Confidence: `medium`
 
-Generate or review the Strong Migrations initializer so project-specific safety settings are explicit.
+Add a template or explicit render/redirect/head response.
 
-**Agent instruction:** Add the standard Strong Migrations initializer only after checking project database adapter and deployment practices.
+**Agent instruction:** Inspect the action intent. Add the missing view or explicit response and cover the route with a request/controller test.
+
+### MEDIUM: TooManyStatements: has the smell of too many statements
+
+- Tool: `reek`
+- Category: `code-smell`
+- Location: `app/models/post.rb:4`
+- Confidence: `high`
+
+Refactor the local smell without broad behavior changes.
+
+**Agent instruction:** Refactor only the affected method/class. Preserve public behavior and add or run tests around the changed code.
+
+### MEDIUM: Rails/TimeZone: Use Time.current instead of Time.now.
+
+- Tool: `rubocop`
+- Category: `lint`
+- Location: `app/models/post.rb:6`
+- Confidence: `high`
+
+Fix the RuboCop offense or document why this cop should be configured differently.
+
+**Agent instruction:** Apply a minimal change that satisfies Rails/TimeZone. Preserve behavior and run the relevant tests.
+
+### LOW: rubocop-rails appears to be outdated
+
+- Tool: `dependency_freshness`
+- Category: `dependency-freshness`
+- Location: `Gemfile.lock`
+- Confidence: `medium`
+
+Review the update risk and update in a separate dependency-focused change.
+
+**Agent instruction:** Do not batch this with feature work. Update rubocop-rails conservatively and run the full test suite.
+
+### LOW: strong_migrations appears to be outdated
+
+- Tool: `dependency_freshness`
+- Category: `dependency-freshness`
+- Location: `Gemfile.lock`
+- Confidence: `medium`
+
+Review the update risk and update in a separate dependency-focused change.
+
+**Agent instruction:** Do not batch this with feature work. Update strong_migrations conservatively and run the full test suite.
 
 
 ## Hotspots
 
 - `app/controllers/posts_controller.rb`: score 39, 7 findings, churn 0, changed=false
 - `app/models/post.rb`: score 30, 6 findings, churn 0, changed=false
-- `Gemfile.lock`: score 7, 1 findings, churn 0, changed=false
+- `Gemfile.lock`: score 16, 10 findings, churn 0, changed=false
 - `db/schema.rb`: score 7, 1 findings, churn 0, changed=false
 - `app/models/user.rb`: score 7, 1 findings, churn 0, changed=false
 - `config/routes.rb`: score 7, 1 findings, churn 0, changed=false
