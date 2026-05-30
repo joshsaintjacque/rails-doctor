@@ -5,8 +5,8 @@ require_relative "lib/rails_doctor/version"
 Gem::Specification.new do |spec|
   spec.name = "rails-doctor"
   spec.version = RailsDoctor::VERSION
-  spec.authors = ["Rails Doctor Contributors"]
-  spec.email = ["maintainers@example.com"]
+  spec.authors = ["Josh Saint Jacque"]
+  spec.email = ["joshsaintjacque@gmail.com"]
 
   spec.summary = "Rails health scanner for humans, CI, and AI coding agents."
   spec.description = "Rails Doctor orchestrates trusted Rails/Ruby quality tools, adds Rails-specific checks, and emits human and agent-readable health reports."
