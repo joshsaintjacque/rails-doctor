@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="site/assets/rails-doctor-logo.png" alt="" width="220">
+</p>
+
 # Rails Doctor
 
 [![CI](https://github.com/joshsaintjacque/rails-doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/joshsaintjacque/rails-doctor/actions/workflows/ci.yml)

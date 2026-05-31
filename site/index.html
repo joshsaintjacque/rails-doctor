@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rails Doctor</title>
   <meta name="description" content="Rails health reports for developers, CI, and AI coding agents.">
+  <link rel="icon" href="assets/rails-doctor-favicon.png" type="image/png">
   <style>
     :root {
       --ink: #151515;
@@ -80,12 +81,31 @@
       text-decoration: none;
       color: rgba(255,253,248,.84);
     }
-    .mark { font-weight: 800; }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      font-weight: 800;
+    }
+    .brand img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      flex: 0 0 auto;
+    }
     .hero-inner {
       position: relative;
       z-index: 2;
       max-width: 760px;
       animation: rise .7s ease-out both;
+    }
+    .hero-logo {
+      display: block;
+      width: clamp(88px, 10vw, 132px);
+      height: auto;
+      margin: 0 0 20px;
+      filter: drop-shadow(0 18px 32px rgba(0,0,0,.34));
     }
     h1 {
       margin: 0 0 18px;
@@ -186,6 +206,7 @@
     @media (max-width: 840px) {
       nav { align-items: flex-start; font-size: 14px; padding: 22px 24px; }
       nav div { gap: 13px; }
+      .brand img { width: 30px; height: 30px; }
       .hero { min-height: 88svh; }
       .hero::after { background: linear-gradient(180deg, rgba(17,16,14,.92), rgba(17,16,14,.76)); }
       .hero-visual { inset: 16svh -24vw auto auto; width: 110vw; height: 58svh; opacity: .22; }
@@ -203,7 +224,10 @@
 </head>
 <body>
   <nav>
-    <a class="mark" href="#">Rails Doctor</a>
+    <a class="brand" href="#" aria-label="Rails Doctor home">
+      <img src="assets/rails-doctor-logo.png" alt="">
+      <span>Rails Doctor</span>
+    </a>
     <div>
       <a href="https://github.com/joshsaintjacque/rails-doctor#readme">Docs</a>
       <a href="report.html">Report</a>
@@ -216,6 +240,7 @@
       <img src="assets/report-preview.png" alt="">
     </div>
     <div class="hero-inner">
+      <img class="hero-logo" src="assets/rails-doctor-logo.png" alt="">
       <h1>Rails Doctor</h1>
       <p class="lede">A Rails health report for humans, CI, and AI coding agents.</p>
       <div class="actions">
