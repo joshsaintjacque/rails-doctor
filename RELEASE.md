@@ -14,9 +14,10 @@ rbenv exec gem build rails-doctor.gemspec
 Review generated artifacts:
 
 ```sh
-rbenv exec ruby test/fixtures/rails_apps/sample_app/../../../../exe/rails-doctor --profile deep --format json --output examples/report.json
-rbenv exec ruby test/fixtures/rails_apps/sample_app/../../../../exe/rails-doctor --profile deep --format markdown --output examples/report.md
-rbenv exec ruby test/fixtures/rails_apps/sample_app/../../../../exe/rails-doctor --profile deep --format html --output examples/report.html
+cd test/fixtures/rails_apps/sample_app
+rbenv exec ruby ../../../../exe/rails-doctor --profile deep --format json --output ../../../../examples/report.json
+rbenv exec ruby ../../../../exe/rails-doctor --profile deep --format markdown --output ../../../../examples/report.md
+rbenv exec ruby ../../../../exe/rails-doctor --profile deep --format html --output ../../../../examples/report.html
 ```
 
 ## Publish
@@ -24,8 +25,9 @@ rbenv exec ruby test/fixtures/rails_apps/sample_app/../../../../exe/rails-doctor
 The CLI is intended to remain fully open source and published on RubyGems.
 
 ```sh
-gem push rails-doctor-*.gem
-git tag v0.1.0
+version=$(ruby -Ilib -rrails_doctor/version -e 'print RailsDoctor::VERSION')
+gem push "rails-doctor-${version}.gem"
+git tag "v${version}"
 git push origin main --tags
 ```
 

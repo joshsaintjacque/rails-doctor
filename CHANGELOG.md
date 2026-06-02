@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3
+
+- Reduced Rails route-check false positives for `resources` `only:`/`except:` options, namespace and `scope module:` blocks, inherited Devise controller actions, and private controller helper methods.
+- Made `rails-doctor init --install` run Bundler through the active Ruby executable so rbenv/asdf/shimmed environments use the same Ruby context as Rails Doctor.
+- Added npm install steps to generated GitHub Actions workflows when a `package-lock.json` is present, improving Rails app support for npm-managed frontend assets.
+
 ## 0.2.0
 
 - Improved Rails schema parsing for inline indexes, single-column indexes, scoped uniqueness validations, partial unique indexes, and string-backed foreign keys.

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require "rbconfig"
+require "shellwords"
 require "yaml"
 
 module RailsDoctor
@@ -133,6 +135,13 @@ module RailsDoctor
                   with:
                     ruby-version: ${{ matrix.ruby }}
                     bundler-cache: true
+                - uses: actions/setup-node@v4
+                  if: ${{ hashFiles('package-lock.json') != '' }}
+                  with:
+                    node-version: "22"
+                    cache: npm
+                - run: npm ci
+                  if: ${{ hashFiles('package-lock.json') != '' }}
                 - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format markdown --output tmp/rails-doctor/summary.md
                 - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format json --output tmp/rails-doctor/report.json
                 - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format html --output tmp/rails-doctor/report.html
@@ -180,8 +189,12 @@ module RailsDoctor
       def install_command(gems, group: nil)
         grouped = group ? { group => gems } : gems.group_by { |gem| RECOMMENDED_GEMS.fetch(gem) }
         grouped.map do |target_group, target_gems|
-          "bundle add #{target_gems.join(" ")} --group=#{target_group}"
+          "#{bundle_command} add #{target_gems.join(" ")} --group=#{target_group}"
         end.join(" && ")
+      end
+
+      def bundle_command
+        "#{Shellwords.escape(RbConfig.ruby)} -S bundle"
       end
 
       def deep_profile?

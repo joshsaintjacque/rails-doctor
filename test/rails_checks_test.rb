@@ -140,6 +140,203 @@ class RailsChecksTest < Minitest::Test
     end
   end
 
+  def test_resource_only_routes_and_private_controller_helpers_do_not_create_route_noise
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          resources :posts, only: [:index]
+          resources :comments,
+            only: %i(index show)
+          resources :photos,
+            except: %w(destroy)
+        end
+      RUBY
+      FileUtils.mkdir_p(File.join(dir, "app/controllers"))
+      FileUtils.mkdir_p(File.join(dir, "app/views/posts"))
+      File.write(File.join(dir, "app/controllers/posts_controller.rb"), <<~RUBY)
+        class PostsController < ApplicationController
+          def index
+          end
+
+          private
+
+          def normalize_filter
+          end
+        end
+      RUBY
+      File.write(File.join(dir, "app/views/posts/index.html.erb"), "<h1>Posts</h1>")
+      write_controller_with_actions(dir, "comments_controller.rb", "CommentsController", %w[index show])
+      write_controller_with_actions(dir, "photos_controller.rb", "PhotosController", %w[index show new create edit update])
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert_empty route_messages, route_messages.join("\n")
+    end
+  end
+
+  def test_method_specific_private_declarations_do_not_hide_later_public_actions
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          resources :posts, only: %i[index show]
+        end
+      RUBY
+      FileUtils.mkdir_p(File.join(dir, "app/controllers"))
+      FileUtils.mkdir_p(File.join(dir, "app/views/posts"))
+      File.write(File.join(dir, "app/controllers/posts_controller.rb"), <<~RUBY)
+        class PostsController < ApplicationController
+          def index
+          end
+
+          def normalize_filter
+          end
+          private :normalize_filter
+
+          def show
+          end
+        end
+      RUBY
+      File.write(File.join(dir, "app/views/posts/index.html.erb"), "<h1>Posts</h1>")
+      File.write(File.join(dir, "app/views/posts/show.html.erb"), "<h1>Post</h1>")
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert_empty route_messages, route_messages.join("\n")
+    end
+  end
+
+  def test_control_flow_blocks_inside_namespaces_do_not_drop_module_context
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          namespace :admin do
+            if ENV["ADMIN_ROUTES"]
+            end
+
+            resources :posts, only: :index
+          end
+        end
+      RUBY
+      write_controller(dir, "admin/posts_controller.rb", "Admin::PostsController", "index")
+      FileUtils.mkdir_p(File.join(dir, "app/views/admin/posts"))
+      File.write(File.join(dir, "app/views/admin/posts/index.html.erb"), "<h1>Admin posts</h1>")
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert_empty route_messages, route_messages.join("\n")
+    end
+  end
+
+  def test_singular_resources_use_plural_controller_names
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          resource :status, only: :show
+          resource :person, only: :show
+        end
+      RUBY
+      write_controller(dir, "statuses_controller.rb", "StatusesController", "show", body: "head :ok")
+      write_controller(dir, "people_controller.rb", "PeopleController", "show", body: "head :ok")
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert_empty route_messages, route_messages.join("\n")
+    end
+  end
+
+  def test_namespace_and_scope_module_routes_resolve_controller_paths
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          namespace :admin do
+            resources :posts, only: %i[index]
+            get "dashboard", to: "dashboards#show"
+          end
+
+          scope module: :nest do
+            resources :routines, only: :show
+          end
+
+          scope module: :admin,
+            path: "admin-extra" do
+            resources :reports, only: :index
+          end
+        end
+      RUBY
+      write_controller(dir, "admin/posts_controller.rb", "Admin::PostsController", "index")
+      write_controller(dir, "admin/dashboards_controller.rb", "Admin::DashboardsController", "show", body: "head :ok")
+      write_controller(dir, "admin/reports_controller.rb", "Admin::ReportsController", "index")
+      write_controller(dir, "nest/routines_controller.rb", "Nest::RoutinesController", "show", body: "head :ok")
+      FileUtils.mkdir_p(File.join(dir, "app/views/admin/posts"))
+      File.write(File.join(dir, "app/views/admin/posts/index.html.erb"), "<h1>Admin posts</h1>")
+      FileUtils.mkdir_p(File.join(dir, "app/views/admin/reports"))
+      File.write(File.join(dir, "app/views/admin/reports/index.html.erb"), "<h1>Admin reports</h1>")
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert_empty route_messages, route_messages.join("\n")
+    end
+  end
+
+  def test_devise_controller_inherited_actions_are_not_reported_as_missing
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          get "/users/sign_in", to: "users/sessions#new"
+          delete "/users/sign_out", to: "users/sessions#destroy"
+        end
+      RUBY
+      FileUtils.mkdir_p(File.join(dir, "app/controllers/users"))
+      File.write(File.join(dir, "app/controllers/users/sessions_controller.rb"), <<~RUBY)
+        class Users::SessionsController < Devise::SessionsController
+          private
+
+          def after_sign_in_path_for(resource)
+            root_path
+          end
+        end
+      RUBY
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      refute route_messages.any? { |message| message.include?("users/sessions#new") }, route_messages.join("\n")
+      refute route_messages.any? { |message| message.include?("after_sign_in_path_for") }, route_messages.join("\n")
+    end
+  end
+
+  def test_devise_controller_only_suppresses_actions_inherited_by_that_controller_type
+    Dir.mktmpdir do |dir|
+      write_minimal_rails_app(dir)
+      File.write(File.join(dir, "config/routes.rb"), <<~RUBY)
+        Rails.application.routes.draw do
+          get "/users/session/edit", to: "users/sessions#edit"
+        end
+      RUBY
+      FileUtils.mkdir_p(File.join(dir, "app/controllers/users"))
+      File.write(File.join(dir, "app/controllers/users/sessions_controller.rb"), <<~RUBY)
+        class Users::SessionsController < Devise::SessionsController
+        end
+      RUBY
+
+      result = scan_with_rails_checks(dir)
+
+      route_messages = route_messages(result)
+      assert route_messages.any? { |message| message.include?("users/sessions#edit") }, route_messages.join("\n")
+    end
+  end
+
   private
 
   def write_minimal_rails_app(dir)
@@ -160,5 +357,40 @@ class RailsChecksTest < Minitest::Test
       }
     )
     RailsDoctor::Scanner.new(project_root: dir, config: config, env: test_env).run(profile: "fast")
+  end
+
+  def write_controller(dir, path, class_name, action, body: nil)
+    target = File.join(dir, "app/controllers", path)
+    FileUtils.mkdir_p(File.dirname(target))
+    File.write(target, <<~RUBY)
+      class #{class_name} < ApplicationController
+        def #{action}
+          #{body}
+        end
+      end
+    RUBY
+  end
+
+  def write_controller_with_actions(dir, path, class_name, actions)
+    target = File.join(dir, "app/controllers", path)
+    FileUtils.mkdir_p(File.dirname(target))
+    action_source = actions.map do |action|
+      <<~RUBY
+        def #{action}
+          head :ok
+        end
+      RUBY
+    end.join("\n")
+    File.write(target, <<~RUBY)
+      class #{class_name} < ApplicationController
+      #{action_source}
+      end
+    RUBY
+  end
+
+  def route_messages(result)
+    result.findings
+      .select { |finding| %w[routing dead-code].include?(finding.category) }
+      .map(&:message)
   end
 end

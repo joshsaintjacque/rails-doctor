@@ -1,9 +1,28 @@
 # frozen_string_literal: true
 
+begin
+  require "active_support/inflector"
+rescue LoadError
+  nil
+end
+
 module RailsDoctor
   module Checks
     class RailsChecks
       NAME = "rails_checks"
+      RESTFUL_ACTIONS = %w[index show new create edit update destroy].freeze
+      SINGULAR_RESTFUL_ACTIONS = %w[show new create edit update destroy].freeze
+      DEVISE_INHERITED_ACTIONS = {
+        "Devise::ConfirmationsController" => %w[new create show],
+        "Devise::OmniauthCallbacksController" => %w[failure passthru],
+        "Devise::PasswordsController" => %w[new create edit update],
+        "Devise::RegistrationsController" => %w[cancel create destroy edit new update],
+        "Devise::SessionsController" => %w[create destroy new],
+        "Devise::UnlocksController" => %w[new create show]
+      }.freeze
+      FALLBACK_IRREGULAR_PLURALS = {
+        "person" => "people"
+      }.freeze
 
       attr_reader :project, :config, :runner, :profile, :changed_files
 
@@ -153,9 +172,11 @@ module RailsDoctor
           end
 
           controller_source = File.read(controller_file)
-          defined_actions = controller_source.scan(/^\s*def\s+([a-zA-Z_]\w*[!?=]?)/).flatten
+          defined_actions = controller_actions(controller_source)
           actions.each do |action|
             unless defined_actions.include?(action)
+              next if inherited_route_action?(controller_source, action)
+
               findings << Finding.new(
                 severity: "high",
                 category: "routing",
@@ -377,17 +398,178 @@ module RailsDoctor
 
         source = File.read(path)
         route_map = Hash.new { |hash, key| hash[key] = [] }
+        block_stack = []
 
-        source.scan(/to:\s*["']([a-zA-Z0-9_\/]+)#([a-zA-Z_]\w*)["']/).each do |controller, action|
-          route_map[controller] << action
-        end
+        route_lines(source).each do |line|
+          next if line.empty? || line.start_with?("#")
 
-        source.scan(/resources\s+:([a-zA-Z_]\w*)/).each do |resource|
-          controller = resource.first
-          route_map[controller].concat(%w[index show new create edit update destroy])
+          if line.match?(/\Aend\b/)
+            block_stack.pop
+            next
+          end
+
+          module_stack = block_stack.filter_map { |frame| frame[:module] }
+          add_explicit_routes(route_map, line, module_stack)
+          add_resource_routes(route_map, line, module_stack)
+
+          block_stack << route_block_frame(line) if route_block_opens?(line)
         end
 
         route_map.transform_values { |actions| actions.uniq.sort }
+      end
+
+      def route_lines(source)
+        lines = []
+        buffer = nil
+
+        source.each_line do |raw_line|
+          line = raw_line.strip
+
+          if buffer
+            buffer = "#{buffer} #{line}"
+            if route_statement_complete?(buffer)
+              lines << buffer
+              buffer = nil
+            end
+          elsif route_statement_start?(line) && !route_statement_complete?(line)
+            buffer = line
+          else
+            lines << line
+          end
+        end
+
+        lines << buffer if buffer
+        lines
+      end
+
+      def route_statement_start?(line)
+        line.match?(/\A(?:get|post|put|patch|delete|match|root|namespace|scope|resource|resources)\b/)
+      end
+
+      def route_statement_complete?(line)
+        return false if line.end_with?(",")
+
+        bracket_balanced?(line, "[", "]") &&
+          bracket_balanced?(line, "{", "}") &&
+          bracket_balanced?(line, "(", ")")
+      end
+
+      def bracket_balanced?(line, left, right)
+        line.count(left) == line.count(right)
+      end
+
+      def route_block_opens?(line)
+        line.match?(/\bdo\b/) || line.match?(/\A(?:if|unless|case|begin)\b/)
+      end
+
+      def add_explicit_routes(route_map, line, module_stack)
+        line.scan(/to:\s*["'](\/?)([a-zA-Z0-9_\/]+)#([a-zA-Z_]\w*)["']/).each do |absolute, controller, action|
+          modules = absolute == "/" ? [] : route_modules(line, module_stack)
+          route_map[controller_with_modules(controller, modules)] << action
+        end
+      end
+
+      def add_resource_routes(route_map, line, module_stack)
+        line.scan(/\b(resource|resources)\s+:([a-zA-Z_]\w*)(.*)$/).each do |kind, resource, options|
+          singular = kind == "resource"
+          controller = route_option_value(options, "controller") || (singular ? pluralize(resource) : resource)
+          absolute = controller.start_with?("/")
+          modules = absolute ? [] : route_modules(options, module_stack)
+          route_map[controller_with_modules(controller.delete_prefix("/"), modules)].concat(resource_actions(options, singular: singular))
+        end
+      end
+
+      def route_block_frame(line)
+        { module: route_namespace_module(line) || route_scope_module(line) }.compact
+      end
+
+      def route_namespace_module(line)
+        match = line.match(/\bnamespace\s+(?::([a-zA-Z_]\w*)|["']([^"']+)["'])/)
+        match && (match[1] || match[2])
+      end
+
+      def route_scope_module(line)
+        route_option_value(line, "module") if line.match?(/\bscope\b/)
+      end
+
+      def route_modules(options, module_stack)
+        module_stack + [route_option_value(options, "module")].compact
+      end
+
+      def controller_with_modules(controller, modules)
+        prefix = modules.reject(&:empty?).join("/")
+        return controller if prefix.empty?
+        return controller if controller == prefix || controller.start_with?("#{prefix}/")
+
+        "#{prefix}/#{controller}"
+      end
+
+      def resource_actions(options, singular:)
+        actions = singular ? SINGULAR_RESTFUL_ACTIONS.dup : RESTFUL_ACTIONS.dup
+        only = route_action_option(options, "only")
+        except = route_action_option(options, "except")
+        actions &= only if only
+        actions -= except if except
+        actions
+      end
+
+      def route_action_option(options, key)
+        percent_list = /%[iIwW](?:\[[^\]]*\]|\([^\)]*\)|\{[^\}]*\}|<[^>]*>)/
+        match = options.match(/\b#{Regexp.escape(key)}:\s*(\[[^\]]*\]|#{percent_list}|:[a-zA-Z_]\w*|["'][^"']+["'])/)
+        return unless match
+
+        extract_route_actions(match[1])
+      end
+
+      def extract_route_actions(value)
+        if value.start_with?("%i", "%I", "%w", "%W")
+          value[/\A%[iIwW].(.*).\z/, 1].to_s.split(/\s+/)
+        elsif value.start_with?("[")
+          value.scan(/:([a-zA-Z_]\w*)/).flatten + value.scan(/["']([a-zA-Z_]\w*)["']/).flatten
+        else
+          [value.delete_prefix(":").delete_prefix("\"").delete_suffix("\"").delete_prefix("'").delete_suffix("'")]
+        end.uniq
+      end
+
+      def route_option_value(options, key)
+        match = options.match(/\b#{Regexp.escape(key)}:\s*(?::([a-zA-Z_]\w*)|["']([^"']+)["'])/)
+        match && (match[1] || match[2])
+      end
+
+      def controller_actions(source)
+        visibility = :public
+        actions = []
+        all_methods = []
+        non_public_methods = []
+        public_methods = []
+
+        source.each_line do |line|
+          if line.match?(/^\s*(private|protected)\s*(?:#.*)?$/)
+            visibility = :non_public
+          elsif line.match?(/^\s*public\s*(?:#.*)?$/)
+            visibility = :public
+          elsif (match = line.match(/^\s*(?:private|protected)\s+(.+)/))
+            non_public_methods.concat(visibility_method_names(match[1]))
+          elsif (match = line.match(/^\s*public\s+(.+)/))
+            public_methods.concat(visibility_method_names(match[1]))
+          elsif visibility == :public && (match = line.match(/^\s*def\s+([a-zA-Z_]\w*[!?=]?)/))
+            all_methods << match[1]
+            actions << match[1]
+          elsif (match = line.match(/^\s*def\s+([a-zA-Z_]\w*[!?=]?)/))
+            all_methods << match[1]
+          end
+        end
+
+        ((actions - non_public_methods) + (all_methods & public_methods)).uniq
+      end
+
+      def visibility_method_names(source)
+        source.scan(/:([a-zA-Z_]\w*[!?=]?)/).flatten + source.scan(/["']([a-zA-Z_]\w*[!?=]?)["']/).flatten
+      end
+
+      def inherited_route_action?(source, action)
+        superclass = source[/<\s*(Devise::[A-Za-z0-9_:]+Controller)/, 1]
+        DEVISE_INHERITED_ACTIONS.fetch(superclass, []).include?(action)
       end
 
       def explicit_response?(source, action)
@@ -414,7 +596,10 @@ module RailsDoctor
       end
 
       def pluralize(value)
+        return ActiveSupport::Inflector.pluralize(value) if defined?(ActiveSupport::Inflector)
+        return FALLBACK_IRREGULAR_PLURALS.fetch(value) if FALLBACK_IRREGULAR_PLURALS.key?(value)
         return value.sub(/y\z/, "ies") if value.end_with?("y")
+        return "#{value}es" if value.match?(/(?:s|x|z|ch|sh)\z/)
         return value if value.end_with?("s")
 
         "#{value}s"

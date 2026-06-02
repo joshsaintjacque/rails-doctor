@@ -23,6 +23,13 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - uses: actions/setup-node@v4
+        if: ${{ hashFiles('package-lock.json') != '' }}
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+        if: ${{ hashFiles('package-lock.json') != '' }}
       - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format markdown --output tmp/rails-doctor/summary.md
       - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format json --output tmp/rails-doctor/report.json
       - run: bundle exec rails-doctor --profile ci --base origin/${{ github.base_ref || 'main' }} --format html --output tmp/rails-doctor/report.html

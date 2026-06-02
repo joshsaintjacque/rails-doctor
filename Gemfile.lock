@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rails-doctor (0.2.0)
+    rails-doctor (0.3)
 
 GEM
   remote: https://rubygems.org/

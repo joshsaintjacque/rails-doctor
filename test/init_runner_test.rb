@@ -38,10 +38,13 @@ class InitRunnerTest < Minitest::Test
       assert File.exist?(File.join(dir, ".rails-doctor.yml"))
       workflow = File.read(File.join(dir, ".github/workflows/rails-doctor.yml"))
       assert_includes workflow, "--base origin/${{ github.base_ref || 'main' }}"
+      assert_includes workflow, "actions/setup-node@v4"
+      assert_includes workflow, "npm ci"
       assert_includes workflow, "Optional PR comment"
 
-      install = runner.commands.find { |item| item[:command].start_with?("bundle add") }
+      install = runner.commands.find { |item| item[:command].include?(" -S bundle add") }
       refute_nil install
+      assert_includes install[:command], "#{Shellwords.escape(RbConfig.ruby)} -S bundle add"
       assert_includes install[:command], "rubocop"
       assert_includes install[:command], "--group=development,test"
       assert_equal 300, install[:timeout_seconds]
@@ -72,5 +75,13 @@ class InitRunnerTest < Minitest::Test
       assert_includes output, "SimpleCov"
       assert_includes output, "raw tool exit codes"
     end
+  end
+
+  def test_packaged_github_actions_example_includes_node_asset_steps
+    workflow = File.read(File.expand_path("../examples/github-actions/rails-doctor.yml", __dir__))
+
+    assert_includes workflow, "actions/setup-node@v4"
+    assert_includes workflow, "hashFiles('package-lock.json')"
+    assert_includes workflow, "npm ci"
   end
 end
