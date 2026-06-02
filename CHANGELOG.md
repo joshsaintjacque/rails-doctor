@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0
+
+- Improved Rails schema parsing for inline indexes, single-column indexes, scoped uniqueness validations, partial unique indexes, and string-backed foreign keys.
+- Added normalized tool-run statuses and report notes so nonzero advisory tool exits are easier to interpret.
+- Added deeper `rails-doctor init --profile deep` setup guidance with exact companion-tool install commands.
+- Bumped the JSON output schema to `1.2` for tool-run status metadata.
+
 ## 0.1.0
 
 - Initial Rails Doctor CLI and gem scaffold.

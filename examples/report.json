@@ -1,230 +1,294 @@
 {
-  "schema_version": "1.1",
-  "generated_at": "2026-05-30T20:00:00Z",
-  "project_root": "/path/to/app",
+  "schema_version": "1.2",
+  "generated_at": "2026-06-02T00:44:51-07:00",
+  "project_root": "/Users/joshs/.codex/worktrees/86c9/rails-doctor/test/fixtures/rails_apps/sample_app",
   "profile": "deep",
   "metadata": {
     "rails_app": true,
     "ruby_version": "3.4.1",
     "rails_version": "8.0.0",
-    "changed_files": []
+    "branch": "codex/rails-doctor-feedback",
+    "changed_files": [
+      "CHANGELOG.md",
+      "Gemfile.lock",
+      "examples/report.html",
+      "examples/report.json",
+      "examples/report.md",
+      "lib/rails_doctor/version.rb"
+    ]
   },
   "summary": {
     "profile": "deep",
-    "duration_ms": 600,
-    "finding_count": 24,
+    "duration_ms": 1513,
+    "finding_count": 32,
     "severity_counts": {
       "medium": 10,
       "critical": 1,
       "high": 10,
-      "low": 3
+      "low": 11
     },
     "skipped_tools": [],
     "score": {
       "overall": 0,
-      "changed_files": 100,
+      "changed_files": 86,
       "confidence": 100,
       "penalties": [
         {
-          "id": "rd-gfnxqbg1qkup",
+          "id": "rd-d3zz5vs3gmfl",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "Rails/TimeZone: Use Time.current instead of Time.now.",
           "penalty": 3.0
         },
         {
-          "id": "rd-op6mq8hfnm99",
+          "id": "rd-eq0ezyxa7a2z",
           "severity": "critical",
           "file": "app/models/post.rb",
           "message": "SQL Injection: Possible SQL injection",
           "penalty": 15.0
         },
         {
-          "id": "rd-habnfsz1zgdj",
+          "id": "rd-rtkkrq8e7lj9",
           "severity": "high",
           "file": "Gemfile.lock",
           "message": "rack: Example vulnerability",
           "penalty": 7.0
         },
         {
-          "id": "rd-2er9zgsavtk6",
+          "id": "rd-vvy3g9716yi5",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "TooManyStatements: has the smell of too many statements",
           "penalty": 3.0
         },
         {
-          "id": "rd-ci7ub1199rvp",
+          "id": "rd-bg0ce5hobpw9",
           "severity": "low",
           "file": "config/initializers/strong_migrations.rb",
           "message": "strong_migrations is installed but no initializer was found",
           "penalty": 0.75
         },
         {
-          "id": "rd-iad8kr5ch7mh",
+          "id": "rd-5dtnk4n1jea6",
           "severity": "high",
           "file": "db/schema.rb",
           "message": "posts.user_id has no index",
           "penalty": 7.0
         },
         {
-          "id": "rd-nd2oek4kujwu",
+          "id": "rd-tkfxo1zmqz5g",
           "severity": "high",
           "file": "app/models/user.rb",
           "message": "users.email has a Rails uniqueness validation without a unique database index",
           "penalty": 5.25
         },
         {
-          "id": "rd-p9vqylkxcybn",
+          "id": "rd-g43eszfyo3c6",
           "severity": "high",
           "file": "config/routes.rb",
           "message": "Routes reference missing ghosts_controller.rb",
           "penalty": 7.0
         },
         {
-          "id": "rd-stmr7t8qmjti",
+          "id": "rd-410x3l5tzlqe",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#create",
           "penalty": 7.0
         },
         {
-          "id": "rd-c9eld5z4i9rf",
+          "id": "rd-htqy7ku5v2mz",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#destroy",
           "penalty": 7.0
         },
         {
-          "id": "rd-hdn01soot3gf",
+          "id": "rd-br7ajv70ozl9",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#edit",
           "penalty": 7.0
         },
         {
-          "id": "rd-ygjxjocmpubf",
+          "id": "rd-q2n5bkjpt0hz",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#new",
           "penalty": 7.0
         },
         {
-          "id": "rd-q2wm1ehy5qn",
+          "id": "rd-79mcx01ioajp",
           "severity": "medium",
           "file": "app/controllers/posts_controller.rb",
           "message": "posts#show has no matching template or explicit response",
           "penalty": 2.25
         },
         {
-          "id": "rd-w4g0okt214t6",
+          "id": "rd-p7o8r0a3te53",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#update",
           "penalty": 7.0
         },
         {
-          "id": "rd-elkkq3siut9a",
+          "id": "rd-isk2gutzhwce",
           "severity": "low",
           "file": "app/controllers/posts_controller.rb",
           "message": "posts#archive is not referenced by simple route analysis",
           "penalty": 0.4
         },
         {
-          "id": "rd-4f2vjquwx6t4",
+          "id": "rd-dxg80kvfkdss",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "1 TODO/FIXME/HACK marker in 10 lines",
           "penalty": 2.25
         },
         {
-          "id": "rd-4dacnomu05u7",
+          "id": "rd-mxhy4rkucurq",
           "severity": "medium",
           "file": null,
           "message": "DEPRECATION WARNING: old API is deprecated",
           "penalty": 2.25
         },
         {
-          "id": "rd-bg982jjw6xt3",
+          "id": "rd-lmk4ptspfnb",
           "severity": "high",
           "file": null,
           "message": "Prosopite: N+1 queries detected for Post => [:user]",
           "penalty": 5.25
         },
         {
-          "id": "rd-qx8han58wk0o",
+          "id": "rd-n20gd17bxaze",
           "severity": "medium",
           "file": null,
           "message": "Line coverage 48.00% is below the 90.00% threshold",
           "penalty": 3.0
         },
         {
-          "id": "rd-9ikgvif63uif",
+          "id": "rd-aj5za4cn63im",
           "severity": "medium",
           "file": "app/controllers/posts_controller.rb",
           "message": "app/controllers/posts_controller.rb line coverage 22.22% is below the 80.00% per-file threshold",
           "penalty": 3.0
         },
         {
-          "id": "rd-s83lai6gkb0r",
+          "id": "rd-5d9k4x43u2t7",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "app/models/post.rb line coverage 44.44% is below the 80.00% per-file threshold",
           "penalty": 3.0
         },
         {
-          "id": "rd-l380zgdih1jq",
+          "id": "rd-yazblzm1oore",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "High complexity score 32.5 for Post#publish!",
           "penalty": 2.25
         },
         {
-          "id": "rd-xq812p6rik5z",
+          "id": "rd-jsmgv21cjcgq",
           "severity": "medium",
           "file": "app/models/post.rb",
           "message": "Similar code group 1 across app/models/post.rb:4, app/models/user.rb:2",
           "penalty": 2.25
         },
         {
-          "id": "rd-7wpu6grg34b2",
+          "id": "rd-2l523vpetaat",
           "severity": "low",
           "file": "Gemfile.lock",
-          "message": "rack appears to be outdated",
+          "message": "brakeman appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-21bsnwgwsxyv",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "bundler-audit appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-o6g3cvcl1bx1",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "flay appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-pgygdbazrew8",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "flog appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-1rqt6ztbkc7f",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "prosopite appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-roz99lainxch",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "rails appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-xq9yk9dxi81p",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "rubocop appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-xkssx5kdqbsz",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "rubocop-rails appears to be outdated",
+          "penalty": 0.75
+        },
+        {
+          "id": "rd-sdsz2rko9ex9",
+          "severity": "low",
+          "file": "Gemfile.lock",
+          "message": "strong_migrations appears to be outdated",
           "penalty": 0.75
         }
       ],
       "top_score_movers": [
         {
-          "id": "rd-op6mq8hfnm99",
+          "id": "rd-eq0ezyxa7a2z",
           "severity": "critical",
           "file": "app/models/post.rb",
           "message": "SQL Injection: Possible SQL injection",
           "penalty": 15.0
         },
         {
-          "id": "rd-habnfsz1zgdj",
+          "id": "rd-rtkkrq8e7lj9",
           "severity": "high",
           "file": "Gemfile.lock",
           "message": "rack: Example vulnerability",
           "penalty": 7.0
         },
         {
-          "id": "rd-w4g0okt214t6",
+          "id": "rd-p7o8r0a3te53",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#update",
           "penalty": 7.0
         },
         {
-          "id": "rd-ygjxjocmpubf",
+          "id": "rd-q2n5bkjpt0hz",
           "severity": "high",
           "file": "app/controllers/posts_controller.rb",
           "message": "Route points to missing posts#new",
           "penalty": 7.0
         },
         {
-          "id": "rd-iad8kr5ch7mh",
+          "id": "rd-5dtnk4n1jea6",
           "severity": "high",
           "file": "db/schema.rb",
           "message": "posts.user_id has no index",
@@ -309,7 +373,7 @@
   },
   "findings": [
     {
-      "id": "rd-gfnxqbg1qkup",
+      "id": "rd-d3zz5vs3gmfl",
       "severity": "medium",
       "category": "lint",
       "tool": "rubocop",
@@ -325,7 +389,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-op6mq8hfnm99",
+      "id": "rd-eq0ezyxa7a2z",
       "severity": "critical",
       "category": "security",
       "tool": "brakeman",
@@ -341,7 +405,7 @@
       }
     },
     {
-      "id": "rd-habnfsz1zgdj",
+      "id": "rd-rtkkrq8e7lj9",
       "severity": "high",
       "category": "dependency-security",
       "tool": "bundler_audit",
@@ -360,7 +424,7 @@
       }
     },
     {
-      "id": "rd-2er9zgsavtk6",
+      "id": "rd-vvy3g9716yi5",
       "severity": "medium",
       "category": "code-smell",
       "tool": "reek",
@@ -377,7 +441,7 @@
       }
     },
     {
-      "id": "rd-ci7ub1199rvp",
+      "id": "rd-bg0ce5hobpw9",
       "severity": "low",
       "category": "migration-safety",
       "tool": "strong_migrations",
@@ -390,7 +454,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-iad8kr5ch7mh",
+      "id": "rd-5dtnk4n1jea6",
       "severity": "high",
       "category": "database-integrity",
       "tool": "rails_checks",
@@ -405,7 +469,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-nd2oek4kujwu",
+      "id": "rd-tkfxo1zmqz5g",
       "severity": "high",
       "category": "database-integrity",
       "tool": "rails_checks",
@@ -420,7 +484,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-p9vqylkxcybn",
+      "id": "rd-g43eszfyo3c6",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -433,7 +497,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-stmr7t8qmjti",
+      "id": "rd-410x3l5tzlqe",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -446,7 +510,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-c9eld5z4i9rf",
+      "id": "rd-htqy7ku5v2mz",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -459,7 +523,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-hdn01soot3gf",
+      "id": "rd-br7ajv70ozl9",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -472,7 +536,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-ygjxjocmpubf",
+      "id": "rd-q2n5bkjpt0hz",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -485,7 +549,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-q2wm1ehy5qn",
+      "id": "rd-79mcx01ioajp",
       "severity": "medium",
       "category": "routing",
       "tool": "rails_checks",
@@ -498,7 +562,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-w4g0okt214t6",
+      "id": "rd-p7o8r0a3te53",
       "severity": "high",
       "category": "routing",
       "tool": "rails_checks",
@@ -511,7 +575,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-elkkq3siut9a",
+      "id": "rd-isk2gutzhwce",
       "severity": "low",
       "category": "dead-code",
       "tool": "rails_checks",
@@ -524,7 +588,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-4f2vjquwx6t4",
+      "id": "rd-dxg80kvfkdss",
       "severity": "medium",
       "category": "technical-debt",
       "tool": "rails_checks",
@@ -537,7 +601,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-4dacnomu05u7",
+      "id": "rd-mxhy4rkucurq",
       "severity": "medium",
       "category": "deprecation",
       "tool": "test_runner",
@@ -550,7 +614,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-bg982jjw6xt3",
+      "id": "rd-lmk4ptspfnb",
       "severity": "high",
       "category": "runtime-n-plus-one",
       "tool": "test_runner",
@@ -565,7 +629,7 @@
       "metadata": {}
     },
     {
-      "id": "rd-qx8han58wk0o",
+      "id": "rd-n20gd17bxaze",
       "severity": "medium",
       "category": "test-coverage",
       "tool": "test_coverage",
@@ -602,7 +666,7 @@
       }
     },
     {
-      "id": "rd-9ikgvif63uif",
+      "id": "rd-aj5za4cn63im",
       "severity": "medium",
       "category": "test-coverage",
       "tool": "test_coverage",
@@ -623,7 +687,7 @@
       }
     },
     {
-      "id": "rd-s83lai6gkb0r",
+      "id": "rd-5d9k4x43u2t7",
       "severity": "medium",
       "category": "test-coverage",
       "tool": "test_coverage",
@@ -648,7 +712,7 @@
       }
     },
     {
-      "id": "rd-l380zgdih1jq",
+      "id": "rd-yazblzm1oore",
       "severity": "medium",
       "category": "complexity",
       "tool": "flog",
@@ -664,7 +728,7 @@
       }
     },
     {
-      "id": "rd-xq812p6rik5z",
+      "id": "rd-jsmgv21cjcgq",
       "severity": "medium",
       "category": "duplication",
       "tool": "flay",
@@ -683,17 +747,137 @@
       }
     },
     {
-      "id": "rd-7wpu6grg34b2",
+      "id": "rd-2l523vpetaat",
       "severity": "low",
       "category": "dependency-freshness",
       "tool": "dependency_freshness",
       "file": "Gemfile.lock",
       "confidence": "medium",
-      "message": "rack appears to be outdated",
+      "message": "brakeman appears to be outdated",
       "recommendation": "Review the update risk and update in a separate dependency-focused change.",
-      "agent_instruction": "Do not batch this with feature work. Update rack conservatively and run the full test suite.",
+      "agent_instruction": "Do not batch this with feature work. Update brakeman conservatively and run the full test suite.",
       "suggested_commands": [
-        "bundle update rack"
+        "bundle update brakeman"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-21bsnwgwsxyv",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "bundler-audit appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update bundler-audit conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update bundler-audit"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-o6g3cvcl1bx1",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "flay appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update flay conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update flay"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-pgygdbazrew8",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "flog appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update flog conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update flog"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-1rqt6ztbkc7f",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "prosopite appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update prosopite conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update prosopite"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-roz99lainxch",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "rails appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update rails conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update rails"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-xq9yk9dxi81p",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "rubocop appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update rubocop conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update rubocop"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-xkssx5kdqbsz",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "rubocop-rails appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update rubocop-rails conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update rubocop-rails"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "rd-sdsz2rko9ex9",
+      "severity": "low",
+      "category": "dependency-freshness",
+      "tool": "dependency_freshness",
+      "file": "Gemfile.lock",
+      "confidence": "medium",
+      "message": "strong_migrations appears to be outdated",
+      "recommendation": "Review the update risk and update in a separate dependency-focused change.",
+      "agent_instruction": "Do not batch this with feature work. Update strong_migrations conservatively and run the full test suite.",
+      "suggested_commands": [
+        "bundle update strong_migrations"
       ],
       "metadata": {}
     }
@@ -731,15 +915,15 @@
     },
     {
       "file": "Gemfile.lock",
-      "score": 8,
-      "finding_count": 2,
-      "churn": 0,
-      "changed": false,
+      "score": 29,
+      "finding_count": 10,
+      "churn": 3,
+      "changed": true,
       "categories": [
         "dependency-freshness",
         "dependency-security"
       ],
-      "summary": "Inherited file with 2 findings across dependency-security, dependency-freshness."
+      "summary": "Changed file with 10 findings across dependency-security, dependency-freshness."
     },
     {
       "file": "db/schema.rb",
@@ -793,8 +977,12 @@
       "skipped": false,
       "command": "../../fake_bin/rubocop",
       "exit_status": 1,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 43,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1,
+        "status_explanation": "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+      }
     },
     {
       "name": "brakeman",
@@ -802,8 +990,12 @@
       "skipped": false,
       "command": "../../fake_bin/brakeman",
       "exit_status": 3,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 37,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1,
+        "status_explanation": "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+      }
     },
     {
       "name": "bundler_audit",
@@ -811,8 +1003,12 @@
       "skipped": false,
       "command": "../../fake_bin/bundle-audit",
       "exit_status": 1,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 35,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1,
+        "status_explanation": "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+      }
     },
     {
       "name": "zeitwerk",
@@ -820,8 +1016,11 @@
       "skipped": false,
       "command": "../../fake_bin/rails zeitwerk:check",
       "exit_status": 0,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 31,
+      "status": "completed",
+      "metadata": {
+        "parsed_finding_count": 0
+      }
     },
     {
       "name": "reek",
@@ -829,18 +1028,23 @@
       "skipped": false,
       "command": "../../fake_bin/reek",
       "exit_status": 2,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 35,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1,
+        "status_explanation": "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+      }
     },
     {
       "name": "strong_migrations",
       "available": true,
       "skipped": false,
       "exit_status": 0,
-      "duration_ms": 50,
+      "status": "completed_with_findings",
       "metadata": {
         "coverage": "strong_migrations gem detected",
-        "initializer_present": false
+        "initializer_present": false,
+        "parsed_finding_count": 1
       }
     },
     {
@@ -848,7 +1052,7 @@
       "available": true,
       "skipped": false,
       "exit_status": 0,
-      "duration_ms": 50,
+      "status": "completed_with_findings",
       "metadata": {
         "checks": [
           "indexes",
@@ -859,7 +1063,8 @@
           "todos",
           "tests",
           "coverage-gaps"
-        ]
+        ],
+        "parsed_finding_count": 11
       }
     },
     {
@@ -868,8 +1073,11 @@
       "skipped": false,
       "command": "../../fake_bin/passing_tests",
       "exit_status": 0,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 33,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 2
+      }
     },
     {
       "name": "test_coverage",
@@ -877,6 +1085,7 @@
       "skipped": false,
       "exit_status": 0,
       "duration_ms": 1,
+      "status": "completed_with_findings",
       "metadata": {
         "coverage": {
           "available": true,
@@ -937,7 +1146,8 @@
           "low_file_count": 2,
           "changed_files_below_threshold": [],
           "metadata": {}
-        }
+        },
+        "parsed_finding_count": 3
       }
     },
     {
@@ -946,8 +1156,11 @@
       "skipped": false,
       "command": "../../fake_bin/flog",
       "exit_status": 0,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 32,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1
+      }
     },
     {
       "name": "flay",
@@ -955,8 +1168,11 @@
       "skipped": false,
       "command": "../../fake_bin/flay",
       "exit_status": 0,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 31,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 1
+      }
     },
     {
       "name": "dependency_freshness",
@@ -964,8 +1180,12 @@
       "skipped": false,
       "command": "bundle outdated --parseable",
       "exit_status": 1,
-      "duration_ms": 50,
-      "metadata": {}
+      "duration_ms": 1212,
+      "status": "completed_with_findings",
+      "metadata": {
+        "parsed_finding_count": 9,
+        "status_explanation": "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+      }
     }
   ]
 }

@@ -2,11 +2,11 @@
 
 - Profile: `deep`
 - Overall score: `0/100`
-- Changed-files score: `100/100`
+- Changed-files score: `86/100`
 - Confidence: `100%`
 - Coverage: `48.00% lines`
-- Findings: `24`
-- Duration: `600ms`
+- Findings: `32`
+- Duration: `1478ms`
 
 ## Coverage
 
@@ -24,11 +24,19 @@ Low-coverage files:
 - `medium`: 10
 - `critical`: 1
 - `high`: 10
-- `low`: 3
+- `low`: 11
 
 ## Skipped Tools
 
 No tools were skipped.
+
+## Tool Run Notes
+
+- `rubocop`: status `completed_with_findings`, exit `1`. The tool exited nonzero and Rails Doctor normalized actionable findings from its output.
+- `brakeman`: status `completed_with_findings`, exit `3`. The tool exited nonzero and Rails Doctor normalized actionable findings from its output.
+- `bundler_audit`: status `completed_with_findings`, exit `1`. The tool exited nonzero and Rails Doctor normalized actionable findings from its output.
+- `reek`: status `completed_with_findings`, exit `2`. The tool exited nonzero and Rails Doctor normalized actionable findings from its output.
+- `dependency_freshness`: status `completed_with_findings`, exit `1`. The tool exited nonzero and Rails Doctor normalized actionable findings from its output.
 
 ## Top Findings
 
@@ -254,7 +262,7 @@ Refactor the local smell without broad behavior changes.
 
 - `app/controllers/posts_controller.rb`: score 42, 8 findings, churn 0, changed=false
 - `app/models/post.rb`: score 33, 7 findings, churn 0, changed=false
-- `Gemfile.lock`: score 8, 2 findings, churn 0, changed=false
+- `Gemfile.lock`: score 29, 10 findings, churn 3, changed=true
 - `db/schema.rb`: score 7, 1 findings, churn 0, changed=false
 - `app/models/user.rb`: score 7, 1 findings, churn 0, changed=false
 - `config/routes.rb`: score 7, 1 findings, churn 0, changed=false
