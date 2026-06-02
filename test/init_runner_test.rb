@@ -34,6 +34,7 @@ class InitRunnerTest < Minitest::Test
       ).run
 
       assert_includes output, "Wrote Rails Doctor configuration."
+      assert_includes output, "Install command"
       assert File.exist?(File.join(dir, ".rails-doctor.yml"))
       workflow = File.read(File.join(dir, ".github/workflows/rails-doctor.yml"))
       assert_includes workflow, "--base origin/${{ github.base_ref || 'main' }}"
@@ -44,6 +45,32 @@ class InitRunnerTest < Minitest::Test
       assert_includes install[:command], "rubocop"
       assert_includes install[:command], "--group=development,test"
       assert_equal 300, install[:timeout_seconds]
+    end
+  end
+
+  def test_deep_init_dry_run_prints_profile_setup_guidance
+    Dir.mktmpdir do |dir|
+      File.write(File.join(dir, "Gemfile"), "source \"https://rubygems.org\"\ngem \"rails\"\n")
+      project = RailsDoctor::Project.new(root: dir, runner: FakeRunner.new(commands: []))
+      config = RailsDoctor::Config.load(project_root: dir)
+
+      output = RailsDoctor::Init::Runner.new(
+        project: project,
+        config: config,
+        runner: FakeRunner.new(commands: []),
+        options: {
+          profile: "deep",
+          dry_run: true,
+          yes: false,
+          install: false,
+          ci: false
+        }
+      ).run
+
+      assert_includes output, "Deep profile setup"
+      assert_includes output, "bundle add rubocop"
+      assert_includes output, "SimpleCov"
+      assert_includes output, "raw tool exit codes"
     end
   end
 end

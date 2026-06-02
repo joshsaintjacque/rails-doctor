@@ -15,15 +15,19 @@ class ReporterTest < Minitest::Test
 
       assert_includes terminal, "Top fixes"
       assert_includes terminal, "Coverage:"
+      assert_includes terminal, "Tool run notes"
       assert_includes markdown, "Agent instruction"
       assert_includes markdown, "## Coverage"
+      assert_includes markdown, "## Tool Run Notes"
       assert_includes html, "Agent Brief"
       assert_includes html, "<h2>Coverage</h2>"
+      assert_includes html, "<h2>Tool Run Notes</h2>"
       assert_includes html, "Coverage: 48.00% lines"
       embedded_json = html.match(%r{<script type="application/json" id="rails-doctor-data">(.*?)</script>}m)[1]
       assert_equal "below_threshold", JSON.parse(embedded_json).fetch("coverage").fetch("status")
-      assert_equal "1.1", json.fetch("schema_version")
+      assert_equal "1.2", json.fetch("schema_version")
       assert_equal "below_threshold", json.fetch("coverage").fetch("status")
+      assert(json.fetch("tool_runs").any? { |tool| tool.fetch("status") == "completed_with_findings" })
       assert_equal result.findings.size, json.fetch("findings").size
     end
   end

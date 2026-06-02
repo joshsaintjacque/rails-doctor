@@ -30,6 +30,10 @@ module RailsDoctor
         @result.tool_runs.select { |tool| tool.stdout.to_s.strip != "" || tool.stderr.to_s.strip != "" }
       end
 
+      def notable_tool_runs
+        @result.tool_runs.select { |tool| tool.metadata[:status_explanation] }
+      end
+
       def coverage
         @result.coverage
       end
@@ -196,6 +200,12 @@ module RailsDoctor
                 font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
                 font-size: 13px;
               }
+	              .tool-note {
+	                padding: 14px 0;
+	                border-top: 1px solid var(--line);
+	              }
+	              .tool-note strong { display: block; margin-bottom: 4px; }
+	              .tool-meta { color: var(--muted); font-size: 13px; }
 	              details { border-top: 1px solid var(--line); padding: 14px 0; }
 	              summary { cursor: pointer; font-weight: 700; }
 	              pre { white-space: pre-wrap; overflow: auto; background: #171717; color: #f7f5f0; padding: 16px; }
@@ -309,6 +319,21 @@ module RailsDoctor
               </section>
 
               <section class="section">
+                <h2>Tool Run Notes</h2>
+                <% if notable_tool_runs.empty? %>
+                  <p>No nonzero tool exits needed normalization.</p>
+                <% else %>
+                  <% notable_tool_runs.each do |tool| %>
+                    <div class="tool-note">
+                      <strong><%= h(tool.name) %></strong>
+                      <div class="tool-meta">Status: <%= h(tool.status) %> · Exit: <%= h(tool.exit_status) %></div>
+                      <p><%= h(tool.metadata[:status_explanation]) %></p>
+                    </div>
+                  <% end %>
+                <% end %>
+              </section>
+
+              <section class="section">
                 <h2>Findings</h2>
                 <div class="filters" role="toolbar" aria-label="Finding filters">
                   <% %w[all critical high medium low info].each do |severity| %>
@@ -372,7 +397,7 @@ module RailsDoctor
                 <% end %>
                 <% raw_tool_runs.each do |tool| %>
                   <details>
-                    <summary><%= h(tool.name) %></summary>
+                    <summary><%= h(tool.name) %> · <%= h(tool.status) %> · exit <%= h(tool.exit_status || "n/a") %></summary>
                     <pre><%= h([tool.stdout, tool.stderr].join("\\n")) %></pre>
                   </details>
                 <% end %>

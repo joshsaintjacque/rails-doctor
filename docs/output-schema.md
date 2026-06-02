@@ -1,6 +1,6 @@
 # Output Schema
 
-`rails-doctor --format json` emits schema version `1.1`.
+`rails-doctor --format json` emits schema version `1.2`.
 
 Top-level fields:
 
@@ -53,5 +53,19 @@ Each finding contains:
 - `metadata`
 
 Agents should treat `agent_instruction` and `suggested_commands` as guidance, not permission to mutate code. Mutation only occurs through an explicit agent workflow outside JSON report generation.
+
+Each tool run contains:
+
+- `name`
+- `available`
+- `skipped`
+- `command`
+- `exit_status`
+- `duration_ms`
+- `skip_reason`
+- `status`
+- `metadata`
+
+`status` is one of `completed`, `completed_with_findings`, `completed_with_filtered_findings`, `adapter_failed`, `skipped`, or `nonzero_exit`. Raw tool exit codes are preserved in `exit_status`; `status` describes Rails Doctor's normalized interpretation for the current report. Nonzero exits may still be `completed` when the adapter parsed no actionable findings. `metadata.status_explanation` explains nonzero exits that need interpretation, and `metadata.parsed_finding_count` records how many findings the adapter produced before report filtering or deduplication.
 
 `metadata` includes detected Ruby and Rails versions, current branch, optional base ref, and changed files used for changed-file scoring.

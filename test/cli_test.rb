@@ -15,7 +15,7 @@ class CLITest < Minitest::Test
         assert_equal 0, run_cli(["scan", "--profile", "deep", "--format", "html", "--output", html_path])
 
         payload = JSON.parse(File.read(json_path))
-        assert_equal "1.1", payload.fetch("schema_version")
+        assert_equal "1.2", payload.fetch("schema_version")
         assert_equal "below_threshold", payload.fetch("coverage").fetch("status")
         assert_includes File.read(markdown_path), "# Rails Doctor Report"
         assert_includes File.read(markdown_path), "## Coverage"

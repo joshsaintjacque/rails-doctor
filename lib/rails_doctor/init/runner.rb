@@ -45,6 +45,14 @@ module RailsDoctor
           lines << "Missing recommended gems"
           missing.each { |gem| lines << "- #{gem} (#{RECOMMENDED_GEMS.fetch(gem)})" }
           lines << ""
+          lines << "Install command"
+          lines << "- #{install_command(missing)}"
+          lines << ""
+        end
+
+        if deep_profile?
+          lines.concat(deep_profile_setup_lines)
+          lines << ""
         end
 
         if options[:dry_run]
@@ -162,11 +170,31 @@ module RailsDoctor
 
       def install_missing(missing, lines)
         missing.group_by { |gem| RECOMMENDED_GEMS.fetch(gem) }.each do |group, gems|
-          command = "bundle add #{gems.join(" ")} --group=#{group}"
+          command = install_command(gems, group: group)
           result = runner.run(command, timeout_seconds: 300)
           lines << "Ran #{command}: exit #{result.exit_status}"
           lines << result.stderr.strip unless result.stderr.to_s.strip.empty?
         end
+      end
+
+      def install_command(gems, group: nil)
+        grouped = group ? { group => gems } : gems.group_by { |gem| RECOMMENDED_GEMS.fetch(gem) }
+        grouped.map do |target_group, target_gems|
+          "bundle add #{target_gems.join(" ")} --group=#{target_group}"
+        end.join(" && ")
+      end
+
+      def deep_profile?
+        options.fetch(:profile, "recommended").to_s == "deep"
+      end
+
+      def deep_profile_setup_lines
+        [
+          "Deep profile setup",
+          "- Configure SimpleCov in test/test_helper.rb or spec/spec_helper.rb so #{config.data.fetch("coverage").fetch("result_path")} is written before Rails Doctor runs.",
+          "- Use a deterministic test command such as COVERAGE=true PARALLEL_WORKERS=1 bin/rails test when parallel coverage merging is not configured.",
+          "- Flog, Flay, and dependency freshness are advisory deep-quality signals; Rails Doctor reports normalized findings separately from raw tool exit codes."
+        ]
       end
 
       def detect_test_command

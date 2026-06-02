@@ -19,6 +19,15 @@ module RailsDoctor
         lines << "Duration: #{@result.duration_ms}ms" if @result.duration_ms
         lines << ""
 
+        if notable_tool_runs.any?
+          lines << "Tool run notes"
+          notable_tool_runs.each do |tool|
+            lines << "- #{tool.name}: #{tool.status}, exit #{tool.exit_status}"
+            lines << "  #{tool.metadata[:status_explanation]}" if tool.metadata[:status_explanation]
+          end
+          lines << ""
+        end
+
         if @result.skipped_tools.any?
           lines << "Skipped tools"
           @result.skipped_tools.each do |tool|
@@ -95,6 +104,10 @@ module RailsDoctor
 
       def top_findings
         @result.findings.sort_by { |finding| -SEVERITY_WEIGHTS.fetch(finding.severity, 0) }.first(8)
+      end
+
+      def notable_tool_runs
+        @result.tool_runs.select { |tool| tool.metadata[:status_explanation] }.first(5)
       end
     end
   end

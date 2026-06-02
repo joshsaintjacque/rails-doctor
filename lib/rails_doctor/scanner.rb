@@ -65,6 +65,7 @@ module RailsDoctor
 
       result.findings = deduplicate(result.findings)
       result.findings = filter_changed(result.findings, changed_files) if changed_only
+      normalize_tool_runs(result)
       scorer = Scorer.new(project: @project, config: @config, changed_files: changed_files)
       result.hotspots = scorer.hotspots(result.findings)
       result.score = scorer.score(result)
@@ -129,8 +130,11 @@ module RailsDoctor
       end
 
       adapter_result = adapter.run
-      result.tool_runs << adapter_result.fetch(:tool_run)
-      result.findings.concat(adapter_result.fetch(:findings))
+      tool_run = adapter_result.fetch(:tool_run)
+      findings = adapter_result.fetch(:findings)
+      tool_run.metadata[:parsed_finding_count] = findings.size
+      result.tool_runs << tool_run
+      result.findings.concat(findings)
       result.coverage = adapter_result[:coverage] if adapter_result[:coverage]
     rescue StandardError => error
       result.tool_runs << ToolRun.new(
@@ -168,6 +172,41 @@ module RailsDoctor
 
     def filter_changed(findings, changed_files)
       findings.select { |finding| finding.file.nil? || changed_files.include?(finding.file) }
+    end
+
+    def normalize_tool_runs(result)
+      visible_findings_by_tool = result.findings.group_by(&:tool)
+      result.tool_runs.each do |tool_run|
+        next if tool_run.skipped
+
+        if tool_run.metadata[:exception]
+          tool_run.status = "adapter_failed"
+          tool_run.metadata[:status_explanation] = "Rails Doctor could not parse or run this adapter; inspect the adapter error before changing application code."
+          next
+        end
+
+        visible_findings = visible_findings_by_tool.fetch(tool_run.name, [])
+        parsed_finding_count = tool_run.metadata.fetch(:parsed_finding_count, visible_findings.size)
+        tool_run.status =
+          if visible_findings.any?
+            "completed_with_findings"
+          elsif parsed_finding_count.positive?
+            "completed_with_filtered_findings"
+          else
+            "completed"
+          end
+
+        next unless tool_run.exit_status.to_i.nonzero?
+
+        tool_run.metadata[:status_explanation] =
+          if visible_findings.any?
+            "The tool exited nonzero and Rails Doctor normalized actionable findings from its output."
+          elsif parsed_finding_count.positive?
+            "The tool exited nonzero and Rails Doctor parsed findings, but none are included in this filtered or deduplicated report."
+          else
+            "The tool exited nonzero, but Rails Doctor parsed no actionable findings from its output."
+          end
+      end
     end
   end
 end

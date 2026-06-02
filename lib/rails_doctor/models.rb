@@ -70,6 +70,7 @@ module RailsDoctor
     :stdout,
     :stderr,
     :skip_reason,
+    :status,
     :metadata,
     keyword_init: true
   ) do
@@ -77,6 +78,7 @@ module RailsDoctor
       super
       self.available = true if available.nil?
       self.skipped = false if skipped.nil?
+      self.status ||= default_status
       self.metadata ||= {}
     end
 
@@ -89,6 +91,7 @@ module RailsDoctor
         exit_status: exit_status,
         duration_ms: duration_ms,
         skip_reason: skip_reason,
+        status: status,
         metadata: metadata
       }.compact
       if include_raw
@@ -96,6 +99,13 @@ module RailsDoctor
         hash[:stderr] = stderr
       end
       hash
+    end
+
+    def default_status
+      return "skipped" if skipped
+      return "completed" if exit_status.nil? || exit_status.zero?
+
+      "nonzero_exit"
     end
   end
 
@@ -260,7 +270,7 @@ module RailsDoctor
 
     def to_h(include_raw: false)
       {
-        schema_version: "1.1",
+        schema_version: "1.2",
         generated_at: (finished_at || Time.now).iso8601,
         project_root: project_root,
         profile: profile,

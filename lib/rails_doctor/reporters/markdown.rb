@@ -39,6 +39,16 @@ module RailsDoctor
           end
         end
         lines << ""
+        lines << "## Tool Run Notes"
+        lines << ""
+        if notable_tool_runs.empty?
+          lines << "No nonzero tool exits needed normalization."
+        else
+          notable_tool_runs.each do |tool|
+            lines << "- `#{tool.name}`: status `#{tool.status}`, exit `#{tool.exit_status}`. #{tool.metadata[:status_explanation]}"
+          end
+        end
+        lines << ""
         lines << "## Top Findings"
         lines << ""
         top_findings.each do |finding|
@@ -73,6 +83,10 @@ module RailsDoctor
 
       def top_findings
         @result.findings.sort_by { |finding| -SEVERITY_WEIGHTS.fetch(finding.severity, 0) }.first(20)
+      end
+
+      def notable_tool_runs
+        @result.tool_runs.select { |tool| tool.metadata[:status_explanation] }
       end
 
       def coverage_lines

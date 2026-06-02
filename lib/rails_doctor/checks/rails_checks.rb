@@ -67,16 +67,21 @@ module RailsDoctor
           tables = Hash.new { |hash, key| hash[key] = { columns: [], indexes: [] } }
 
           schema.scan(/create_table\s+"([^"]+)".*?do \|t\|(.*?)^\s*end/m).each do |table, block|
-            block.scan(/t\.(?:bigint|integer|string|uuid)\s+"([^"]+)"/).each do |column|
-              tables[table][:columns] << column.first
+            block.scan(/t\.(bigint|integer|string|uuid)\s+"([^"]+)"/).each do |type, column|
+              tables[table][:columns] << { name: column, type: type }
+            end
+
+            block.scan(/t\.index\s+\[([^\]]+)\](.*)$/).each do |columns, options|
+              add_schema_index(tables, table, columns, options)
             end
           end
 
           schema.scan(/add_index\s+"([^"]+)",\s+\[([^\]]+)\](.*)$/).each do |table, columns, options|
-            tables[table][:indexes] << {
-              columns: columns.scan(/"([^"]+)"/).flatten,
-              unique: options.include?("unique: true")
-            }
+            add_schema_index(tables, table, columns, options)
+          end
+
+          schema.scan(/add_index\s+"([^"]+)",\s+"([^"]+)"(.*)$/).each do |table, column, options|
+            add_schema_index(tables, table, %("#{column}"), options)
           end
 
           tables
@@ -85,7 +90,7 @@ module RailsDoctor
 
       def missing_foreign_key_indexes
         parsed_schema.flat_map do |table, data|
-          data[:columns].grep(/_id\z/).each_with_object([]) do |column, findings|
+          foreign_key_columns(data).each_with_object([]) do |column, findings|
             next if indexed?(table, [column])
 
             findings << Finding.new(
@@ -109,9 +114,8 @@ module RailsDoctor
           table = table_for_model_path(path)
           next [] unless table
 
-          File.read(path).scan(/validates\s+:([a-zA-Z_]\w*).*?uniqueness:\s*(?:true|\{)/m).each_with_object([]) do |column_match, findings|
-            column = column_match.first
-            next if unique_indexed?(table, [column])
+          uniqueness_validations(File.read(path)).each_with_object([]) do |columns, findings|
+            next if unique_indexed?(table, columns)
 
             findings << Finding.new(
               severity: "high",
@@ -119,10 +123,10 @@ module RailsDoctor
               tool: name,
               file: relative,
               confidence: "medium",
-              message: "#{table}.#{column} has a Rails uniqueness validation without a unique database index",
+              message: "#{table}.#{columns.join(", ")} has a Rails uniqueness validation without a unique database index",
               recommendation: "Back uniqueness validations with a unique index to prevent race-condition duplicates.",
-              agent_instruction: "Add a unique index migration for #{table}.#{column}, handle existing duplicate data if necessary, and rerun tests.",
-              suggested_commands: ["bin/rails generate migration AddUniqueIndexTo#{camelize(table)}#{camelize(column)}"]
+              agent_instruction: "Add a unique index migration for #{table}.#{columns.join(", ")}, handle existing duplicate data if necessary, and rerun tests.",
+              suggested_commands: ["bin/rails generate migration AddUniqueIndexTo#{camelize(table)}#{columns.map { |column| camelize(column) }.join}"]
             )
           end
         end
@@ -305,12 +309,61 @@ module RailsDoctor
         )
       end
 
+      def add_schema_index(tables, table, columns_source, options)
+        columns = columns_source.scan(/"([^"]+)"/).flatten
+        return if columns.empty?
+
+        tables[table][:indexes] << {
+          columns: columns,
+          unique: options.include?("unique: true"),
+          partial: options.include?("where:")
+        }
+      end
+
+      def foreign_key_columns(data)
+        data[:columns].filter_map do |column|
+          next unless column.fetch(:name).end_with?("_id")
+          next unless foreign_key_column?(column)
+
+          column.fetch(:name)
+        end
+      end
+
+      def foreign_key_column?(column)
+        return true if %w[bigint integer uuid].include?(column.fetch(:type))
+
+        column.fetch(:type) == "string" && referenced_table_exists?(column.fetch(:name))
+      end
+
+      def referenced_table_exists?(column_name)
+        parsed_schema.key?(pluralize(column_name.delete_suffix("_id")))
+      end
+
+      def uniqueness_validations(source)
+        source.scan(/validates\s+:([a-zA-Z_]\w*)(.*?)(?=^\s*(?:validates|validate|def|class|module|has_|belongs_to)\b|\z)/m).filter_map do |column, options|
+          next unless options.match?(/uniqueness:\s*(?:true|\{)/)
+
+          [column, *uniqueness_scope_columns(options)]
+        end
+      end
+
+      def uniqueness_scope_columns(options)
+        scope = options[/scope:\s*(\[[^\]]+\]|%[iI]\[[^\]]+\]|:[a-zA-Z_]\w*)/, 1]
+        return [] unless scope
+
+        scope.scan(/:([a-zA-Z_]\w*)/).flatten + scope.scan(/%[iI]\[([^\]]+)\]/).flat_map { |match| match.first.split(/\s+/) }
+      end
+
       def indexed?(table, columns)
-        parsed_schema.fetch(table, { indexes: [] })[:indexes].any? { |index| index[:columns] == columns }
+        parsed_schema.fetch(table, { indexes: [] })[:indexes].any? do |index|
+          index[:columns].take(columns.size) == columns
+        end
       end
 
       def unique_indexed?(table, columns)
-        parsed_schema.fetch(table, { indexes: [] })[:indexes].any? { |index| index[:columns] == columns && index[:unique] }
+        parsed_schema.fetch(table, { indexes: [] })[:indexes].any? do |index|
+          index[:unique] && !index[:partial] && index[:columns].size == columns.size && index[:columns].sort == columns.sort
+        end
       end
 
       def table_for_model_path(path)
